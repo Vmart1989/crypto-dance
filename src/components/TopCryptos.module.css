@@ -1,0 +1,40 @@
+
+
+
+
+.tickerContainer {
+    width: 100%;
+    overflow: hidden;
+    height: 60vh;
+    font-size: 18px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-color: #671ae4 #671ae441;
+    scrollbar-width: thin;
+    background-color: #040111; 
+    
+    
+    
+  }
+
+
+
+  .tickerContainer thead th {
+    position: sticky;
+    top: 0;
+    background-color: #040111; 
+    z-index: 2;
+    
+  }
+  
+  .tickerContent {
+    width: 100%;
+    flex-direction: column;
+    animation: tickerAnimation 100s linear infinite;
+    
+    
+    
+  }
+
+
+  

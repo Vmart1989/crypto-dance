@@ -6,17 +6,16 @@ export default function Home() {
     <div>
       <main className="container mt-5 mb-5">
         <div className="row">
-          <div className="col-12 col-md-9  p-3">
-            <h1>Dive into Crypto without Risks</h1>
-            <h4>Don't know how to start investing in cryptocurrencies? try CryptoDance before using real money!</h4>
+          <div className="p-0 col-12 col-md-8 me-5 border rounded border-primary-subtle">
+            
           <div>
-            <h2 className="my-5">Top 100 Cryptocurrencies by Market Cap</h2>
+            
             <TopCryptos />
           </div>
           
           
           </div>
-          <div className="h-50 col-12 col-md-3 p-3 border border rounded border-primary-subtle">
+          <div className="h-50 col-12 col-md-3 p-3 border rounded border-primary-subtle">
             <div className="">
               <h2 className="mb-4">Login</h2>
               <LoginForm />
