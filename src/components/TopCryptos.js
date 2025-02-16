@@ -35,7 +35,7 @@ export default function CryptoTicker() {
         <thead>
           <tr>
             <th></th>
-            <th></th>
+            <th>Today's top 100 Cryptocurrencies</th>
             <th className="d-none d-md-table-cell p-1">Market Cap</th>
             <th className="p-1">Price</th>
             <th className="p-1">24h Change</th>
@@ -44,8 +44,8 @@ export default function CryptoTicker() {
         <tbody>
           {cryptos.map((crypto) => (
             <tr key={crypto.id}>
-              <td className="ps-2">{crypto.rank}</td>
-              <td><img
+              <td className="ps-2 pb-2">{crypto.rank}</td>
+              <td className="pb-2"><img
           src={`https://assets.coincap.io/assets/icons/${crypto.symbol.toLowerCase()}@2x.png`}
           alt={crypto.name}
           width="24"
@@ -55,11 +55,11 @@ export default function CryptoTicker() {
             e.target.style.display = 'none';
           }}
         /> {crypto.name}</td>
-              <td className="d-none d-md-table-cell ">
+              <td className="d-none d-md-table-cell pb-2">
   $
   {formatLargeNumber(crypto.marketCapUsd)}
 </td>
-<td className="pe-4">
+<td className="pe-4 pb-2">
   $
   {Number(crypto.priceUsd).toLocaleString("en-US", {
     minimumFractionDigits: 2,
@@ -69,8 +69,8 @@ export default function CryptoTicker() {
               <td
                 className={
                   Number(crypto.changePercent24Hr) > 0
-                    ? "text-info"
-                    : "text-danger"
+                    ? "text-info pb-2"
+                    : "text-danger pb-2"
                 }
               >
                 {Number(crypto.changePercent24Hr).toFixed(2)}%

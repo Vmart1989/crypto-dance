@@ -17,7 +17,7 @@ export default function Home() {
           </div>
           <div className="h-50 col-12 col-md-3 p-3 border rounded border-primary-subtle">
             <div className="">
-              <h2 className="mb-4">Login</h2>
+              <h3 className="mb-4">Login to your account</h3>
               <LoginForm />
             <p className="mt-4">New to CryptoDance? Register <a href="#">here.</a></p>
             </div>

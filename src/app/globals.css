@@ -11,6 +11,11 @@
 
 }
 
+h1, h2 {
+  font-family: 'Open Sans', sans-serif !important;
+  font-weight: bold;
+}
+
 body {
   background: radial-gradient(circle, rgb(29, 3, 54) 0%, rgb(17, 2, 41) 35%, rgb(7, 0, 14) 100%);
   min-height: 100vh;
@@ -44,3 +49,7 @@ body a {
   --bs-btn-disabled-border-color: #671ae4;
 }
 
+.form-control:focus {
+  border-color: #671ae4;
+  box-shadow: none;
+}

@@ -1,10 +1,16 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./globals.css";
 import { Oswald } from "next/font/google";
+import { Open_Sans } from "next/font/google";
 
 const oswald = Oswald({
   weight: ["400", "700"],
   subsets: ["latin"],
+});
+
+const openSans = Open_Sans({
+  subsets: ['latin'],
+  weight: ['400', '600', '700'], 
 });
 
 export const metadata = {
@@ -34,6 +40,7 @@ export default function RootLayout({ children }) {
                 </span>
               </h1>
             </a>
+            
 
             <ul className="nav nav-pills">
               <li className="nav-item">
@@ -67,6 +74,7 @@ export default function RootLayout({ children }) {
               </li>
             </ul>
           </header>
+          <h2>Dive into the Crypto World without risks!</h2>
         </div>
         {/* HEADER ENDS */}
 
