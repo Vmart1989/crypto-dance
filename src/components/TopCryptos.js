@@ -35,10 +35,10 @@ export default function CryptoTicker() {
         <thead>
           <tr>
             <th></th>
-            <th>Today's top 100 Cryptocurrencies</th>
-            <th className="d-none d-md-table-cell p-1">Market Cap</th>
-            <th className="p-1">Price</th>
-            <th className="p-1">24h Change</th>
+            <th className="p-1 pb-3">Today's top 100 Cryptocurrencies</th>
+            <th className="d-none d-md-table-cell p-1 pb-3">Market Cap</th>
+            <th className="p-1 pb-3">Price</th>
+            <th className="p-1 pb-3">24h Change</th>
           </tr>
         </thead>
         <tbody>
