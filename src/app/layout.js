@@ -2,6 +2,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./globals.css";
 import { Oswald } from "next/font/google";
 import { Open_Sans } from "next/font/google";
+import { CurrencyProvider } from "../context/CurrencyContext"; 
+import CurrencyToggle from "../components/CurrencyToggle";
 
 const oswald = Oswald({
   weight: ["400", "700"],
@@ -22,6 +24,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={oswald.className}>
+      <CurrencyProvider>
         {/* HEADER */}
         <div className="container">
           <header className="d-flex flex-wrap justify-content-center py-3 mb-4 ">
@@ -41,27 +44,14 @@ export default function RootLayout({ children }) {
               </h1>
             </a>
             
-
-            <ul className="nav nav-pills">
-              <li className="nav-item">
-                <a
-                  href="#"
-                  className="nav-link active bg-primary"
-                  aria-current="page"
-                >
-                  Home
-                </a>
-              </li>
+            <ul className="nav nav-pills d-flex align-items-baseline">
+              
               <li className="nav-item">
                 <a href="#" className="nav-link link-primary">
                   Features
                 </a>
               </li>
-              <li className="nav-item">
-                <a href="#" className="nav-link link-primary">
-                  Pricing
-                </a>
-              </li>
+              
               <li className="nav-item">
                 <a href="#" className="nav-link link-primary">
                   FAQs
@@ -71,6 +61,11 @@ export default function RootLayout({ children }) {
                 <a href="#" className="nav-link link-primary">
                   About
                 </a>
+              </li>
+              <li className="nav-item">
+                
+              
+              <CurrencyToggle />
               </li>
             </ul>
           </header>
@@ -114,6 +109,7 @@ export default function RootLayout({ children }) {
             </p>
           </footer>
         </div>
+        </CurrencyProvider>
       </body>
     </html>
   );

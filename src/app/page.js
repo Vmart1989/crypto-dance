@@ -2,6 +2,8 @@ import LoginForm from "../components/LoginForm";
 import TopCryptos from "../components/TopCryptos";
 
 export default function Home() {
+
+
   return (
     <div>
       <main className="container mt-5 mb-5">
@@ -16,8 +18,8 @@ export default function Home() {
           
           </div>
           <div className="h-50 col-12 col-md-3 p-3 border rounded border-primary-subtle">
-            <div className="">
-              <h3 className="mb-4">Login to start learning</h3>
+            <div >
+              <h3 className="mb-4">Login to start exploring</h3>
               <LoginForm />
             <p className="mt-4">New to CryptoDance? Register <a href="#">here.</a></p>
             </div>
