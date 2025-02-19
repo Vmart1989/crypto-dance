@@ -12,6 +12,7 @@ export default function CryptoTicker() {
   const { currency } = useCurrency();
   // Get conversion rate based on current currency
   const { rate, loading } = useConversionRate(currency);
+  //set search input state
   const [search, setSearch] = useState("");
 
   useEffect(() => {
@@ -48,17 +49,9 @@ export default function CryptoTicker() {
 
   return (
     <div className={styles.tickerContainer}>
-      <div className="mb-1">
-                <input
-                  type="text"
-                  placeholder="Search today's top 100 cryptos..."
-                  className="form-control border border-0"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-              </div>
+      
       <table className="w-100">
-        <thead>
+        <thead className="sticky-top">
           <tr>
             <th>
               {loading && (
@@ -67,10 +60,19 @@ export default function CryptoTicker() {
                 </div>
               )}
             </th>
-            <th className="p-1 pb-3">
-              {/* Search Bar */}
-              
-            </th>
+            <th className="p-1 pb-3 ">{/* Search Bar */}
+      <div className="input-group sticky-top">
+        <span className="input-group-text border-0 bg-transparent ">
+          <i className="bi bi-search text-primary"></i>
+        </span>
+        <input
+          type="text"
+          className="form-control border-0"
+          placeholder="Search top 100 cryptos..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </div></th>
             <th className="d-none d-md-table-cell p-1 pb-3">Market Cap</th>
             <th className="p-1 pb-3">Price</th>
             <th className="p-1 pb-3">24h Change</th>
@@ -79,7 +81,7 @@ export default function CryptoTicker() {
         <tbody>
           {filteredCryptos.map((crypto) => (
             <tr key={crypto.id}>
-              <td className="ps-2 pb-2">{crypto.rank}</td>
+              <td className="ps-2 pb-2 text-primary">{crypto.rank}</td>
               <td className="pb-2">
                 <img
                   src={`https://assets.coincap.io/assets/icons/${crypto.symbol.toLowerCase()}@2x.png`}
