@@ -12,6 +12,7 @@ export default function CryptoTicker() {
   const { currency } = useCurrency();
   // Get conversion rate based on current currency
   const { rate, loading } = useConversionRate(currency);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     async function fetchCryptos() {
@@ -36,8 +37,26 @@ export default function CryptoTicker() {
   // Use appropriate symbol
   const symbol = currency === "USD" ? "$" : "€";
 
+  // Filter cryptos based on the search query (by name or symbol)
+  const filteredCryptos = cryptos.filter((crypto) => {
+    const query = search.toLowerCase();
+    return (
+      crypto.name.toLowerCase().includes(query) ||
+      crypto.symbol.toLowerCase().includes(query)
+    );
+  });
+
   return (
     <div className={styles.tickerContainer}>
+      <div className="mb-1">
+                <input
+                  type="text"
+                  placeholder="Search today's top 100 cryptos..."
+                  className="form-control border border-0"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+              </div>
       <table className="w-100">
         <thead>
           <tr>
@@ -48,15 +67,17 @@ export default function CryptoTicker() {
                 </div>
               )}
             </th>
-            <th className="p-1 pb-3">Today's top 100 Cryptocurrencies</th>
+            <th className="p-1 pb-3">
+              {/* Search Bar */}
+              
+            </th>
             <th className="d-none d-md-table-cell p-1 pb-3">Market Cap</th>
             <th className="p-1 pb-3">Price</th>
             <th className="p-1 pb-3">24h Change</th>
           </tr>
-        
         </thead>
         <tbody>
-          {cryptos.map((crypto) => (
+          {filteredCryptos.map((crypto) => (
             <tr key={crypto.id}>
               <td className="ps-2 pb-2">{crypto.rank}</td>
               <td className="pb-2">
