@@ -9,7 +9,7 @@ export default function Home() {
     <div>
       <main className="container mt-5 mb-5">
         <div className="row">
-          <div className="p-0 col-12 col-md-8 me-5 border rounded border-primary-subtle">
+          <div className="p-0 col-12 col-md-8 me-5 border rounded border-primary-subtle h-100">
           <div>
             <TopCryptos />
           </div>
@@ -22,8 +22,8 @@ export default function Home() {
             <p className="mt-4">New to CryptoDance? Register <a href="#">here.</a></p>
             </div>
             <div className="border rounded border-primary-subtle p-2 mt-5 bg-dark" >
-              <h3 className="mb-4">Today's Top Gainers</h3>
-              <p className="fs-6">Among Current Top 100 by Market Cap</p>
+              <h3 className="mb-4 text-primary">Today's Top Gainers</h3>
+              <p className="text-primary fs-6 lh-1">Among Current Top 100 by Market Cap</p>
               <TopGainers />
               
             </div>
