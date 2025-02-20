@@ -1,10 +1,20 @@
-// app/dashboard/page.js
-export default function DashboardPage() {
-    return (
-      <main className="container mt-4">
-        <h1 className="text-primary">Dashboard</h1>
-        <p>Welcome to your dashboard! Here we will display all crypto data, charts, etc.</p>
-      </main>
-    );
-  }
-  
+"use client";
+
+import { useSearchParams } from "next/navigation";
+
+export default function Dashboard() {
+  const searchParams = useSearchParams();
+  const message = searchParams.get("message");
+
+  return (
+    <div className="container mt-5">
+      {message && (
+        <div className="alert alert-info" role="alert">
+          {message}
+        </div>
+      )}
+      <h1>Dashboard</h1>
+      {/* Your dashboard content */}
+    </div>
+  );
+}
