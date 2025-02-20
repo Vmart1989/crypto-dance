@@ -6,14 +6,17 @@ import { formatLargeNumber } from "../utils/formatNumbers";
 import { formatSuboneNumber } from "../utils/formatNumbers";
 import { useConversionRate } from "../hooks/useConversionRate";
 import { useCurrency } from "../context/CurrencyContext";
-import { sortCryptos } from "../utils/sortCryptos"; 
+import { sortCryptos } from "../utils/sortCryptos";
 
 export default function CryptoTicker() {
   const [cryptos, setCryptos] = useState([]);
   const { currency } = useCurrency();
   const { rate, loading } = useConversionRate(currency);
   const [search, setSearch] = useState("");
-  const [sortConfig, setSortConfig] = useState({ key: "rank", direction: "asc" });
+  const [sortConfig, setSortConfig] = useState({
+    key: "rank",
+    direction: "asc",
+  });
 
   useEffect(() => {
     async function fetchCryptos() {
@@ -96,24 +99,23 @@ export default function CryptoTicker() {
       <table className="w-100">
         <thead className="sticky-top">
           <tr>
-            <th
-              className="p-1 pb-3"
-              
-            >
-              
-            </th>
+            <th className="p-1 pb-3"></th>
             <th className="p-1 pb-3">Today's top 100 Cryptocurrencies</th>
             <th
               className="d-none d-md-table-cell p-1 pb-3"
               onClick={() => handleSort("marketCapUsd")}
-              style={{ cursor: search.trim() === "" ? "pointer" : "not-allowed" }}
+              style={{
+                cursor: search.trim() === "" ? "pointer" : "not-allowed",
+              }}
             >
               Market Cap{renderSortArrow("marketCapUsd")}
             </th>
             <th
               className="p-1 pb-3"
               onClick={() => handleSort("priceUsd")}
-              style={{ cursor: search.trim() === "" ? "pointer" : "not-allowed" }}
+              style={{
+                cursor: search.trim() === "" ? "pointer" : "not-allowed",
+              }}
             >
               Price{renderSortArrow("priceUsd")}
             </th>
@@ -140,9 +142,8 @@ export default function CryptoTicker() {
                 {symbol} {formatLargeNumber(convertValue(crypto.marketCapUsd))}
               </td>
               <td className="pe-4 pb-2">
-  {symbol}{" "}
-  {formatSuboneNumber(convertValue(crypto.priceUsd))}
-</td>
+                {symbol} {formatSuboneNumber(convertValue(crypto.priceUsd))}
+              </td>
               <td
                 className={
                   Number(crypto.changePercent24Hr) > 0

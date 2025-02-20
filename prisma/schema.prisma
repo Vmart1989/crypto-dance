@@ -1,0 +1,47 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// The User model stores basic user info.
+model User {
+  id           Int           @id @default(autoincrement())
+  email        String        @unique
+  password     String
+  name         String?
+  createdAt    DateTime      @default(now())
+  wallet       Wallet?
+  transactions Transaction[]
+}
+
+// The Wallet model stores a user's fiat balance.
+// Each user has one wallet.
+model Wallet {
+  id          Int     @id @default(autoincrement())
+  fiatBalance Float   @default(0.0)
+  user        User    @relation(fields: [userId], references: [id])
+  userId      Int     @unique
+}
+
+// The Transaction model records each user transaction.
+model Transaction {
+  id           Int      @id @default(autoincrement())
+  type         String   // e.g. "buy", "sell", "deposit", "withdrawal"
+  cryptoSymbol String?  // The crypto symbol involved, if applicable
+  amount       Float    // Amount of crypto, if applicable
+  price        Float    // Price per unit at time of transaction
+  fiatAmount   Float    // Total fiat value of the transaction
+  createdAt    DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id])
+  userId       Int
+}
