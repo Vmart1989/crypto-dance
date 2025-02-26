@@ -29,7 +29,7 @@ export default function RegisterForm() {
       } else {
         // Update the user context with the returned user info
         setUser(data.user);
-        // Redirect to the dashboard with a success message
+        console.log("Registered user:", data.user);
         router.push("/dashboard?message=User%20registered%20successfully");
       }
     } catch (error) {
