@@ -2,8 +2,16 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./globals.css";
 import { Oswald } from "next/font/google";
 import { Open_Sans } from "next/font/google";
+import { Teko } from 'next/font/google';
 import { CurrencyProvider } from "../context/CurrencyContext";
 import CurrencyToggle from "../components/CurrencyToggle";
+import { UserProvider } from "../context/UserContext";
+import DynamicMessage from "@/components/DynamicMessage";
+
+const teko = Teko({
+  subsets: ['latin'],
+  weight: ['400', '700'], // Adjust weights as needed
+});
 
 const oswald = Oswald({
   weight: ["400", "700"],
@@ -37,6 +45,7 @@ export default function RootLayout({ children }) {
       </head>
       <body className={oswald.className}>
         <CurrencyProvider>
+        <UserProvider>
           {/* HEADER */}
           <div className="container">
             <header className="d-flex flex-wrap justify-content-center py-3 mb-4 ">
@@ -45,10 +54,10 @@ export default function RootLayout({ children }) {
                 className="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none"
               >
                 <h1>
-                  <span className="display-2 text-primary">
+                  <span className="display-1 text-primary fw-bold">
                     <img
                       src="/logo.png"
-                      width="100px"
+                      width="90px"
                       alt="CryptoDance Logo"
                     ></img>{" "}
                     CryptoDance
@@ -78,7 +87,8 @@ export default function RootLayout({ children }) {
                 </li>
               </ul>
             </header>
-            <h2>Dive into the Crypto World without risks!</h2>
+            {/* Dynamic header text */}
+            <DynamicMessage />
           </div>
           {/* HEADER ENDS */}
 
@@ -118,6 +128,7 @@ export default function RootLayout({ children }) {
               </p>
             </footer>
           </div>
+          </UserProvider>
         </CurrencyProvider>
       </body>
     </html>
