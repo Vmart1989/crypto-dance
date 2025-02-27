@@ -7,6 +7,7 @@ import { CurrencyProvider } from "../context/CurrencyContext";
 import CurrencyToggle from "../components/CurrencyToggle";
 import { UserProvider } from "../context/UserContext";
 import DynamicMessage from "@/components/DynamicMessage";
+import UserHeader from "@/components/UserHeader";
 
 const teko = Teko({
   subsets: ['latin'],
@@ -85,10 +86,12 @@ export default function RootLayout({ children }) {
                 <li className="nav-item">
                   <CurrencyToggle />
                 </li>
+                
               </ul>
             </header>
             {/* Dynamic header text */}
-            <DynamicMessage />
+            <div className="d-flex justify-content-between align-items-center"><DynamicMessage />
+            <UserHeader /></div>
           </div>
           {/* HEADER ENDS */}
 

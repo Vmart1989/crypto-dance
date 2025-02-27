@@ -1,3 +1,5 @@
+
+
 :root {
   --bs-primary: #671ae4;    
   --bs-primary-rgb: 103, 26, 228;
@@ -54,4 +56,23 @@ body a {
 .form-control:focus {
   border-color: #671ae4;
   box-shadow: none;
+}
+
+
+/* style dashboard tabs */
+.custom-tabs .nav-link {
+  color: var(--bs-primary);  /* Default text color for tab titles */
+  font-weight: 500;
+  border: none;
+}
+
+.nav-tabs {
+  border-color: var(--bs-primary-border-subtle);
+}
+
+
+
+.custom-tabs .nav-link.active {
+  color: var(--bs-primary);  /* Text color for the active tab */
+  font-weight: bold;
 }
