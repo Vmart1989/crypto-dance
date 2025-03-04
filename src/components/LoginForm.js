@@ -30,7 +30,7 @@ export default function LoginForm() {
         setUser(data.user);
         // The token is set as an HTTP‑only cookie by the API route,
         // so no need to store it in localStorage.
-        router.push("/dashboard");
+        //router.push("/dashboard");
       }
     } catch (error) {
       console.error("Login error:", error);

@@ -24,10 +24,18 @@ export default function UserHeader() {
       <a
         onClick={handleLogout}
         style={{ cursor: "pointer" }}
-        className="fs-5 link-offset-2 link-offset-3-hover link-underline-primary link-underline-opacity-0 link-underline-opacity-75-hover"
+        className="fs-5 link-offset-2 link-offset-3-hover link-underline-primary link-underline-opacity-0 link-underline-opacity-75-hover me-4"
       >
         <i className="bi bi-box-arrow-right fs-3 me-2"></i>
         Log out
+      </a>
+      <a
+        
+        style={{ cursor: "pointer" }}
+        className="fs-5 link-offset-2 link-offset-3-hover link-underline-primary link-underline-opacity-0 link-underline-opacity-75-hover"
+      >
+        <i className="bi bi-chat-dots fs-3 me-2"></i>
+        AI bot
       </a>
     </div>
   );

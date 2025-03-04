@@ -1,34 +1,52 @@
 "use client";
 
 import { useUser } from "@/context/UserContext";
+import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { Tab, Tabs } from "react-bootstrap";
 import DashboardTabs from "@/components/DashboardTabs";
+import AddFundsButton from "@/components/AddFundsModal";
 
 export default function Dashboard() {
   const searchParams = useSearchParams();
   const message = searchParams.get("message");
-  const { user } = useUser();
+  const { user, setUser } = useUser();
 
+  useEffect(() => {
+    async function refreshUser() {
+      try {
+        const res = await fetch("/api/auth/me");
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data.user);
+        }
+      } catch (error) {
+        console.error("Error refreshing user:", error);
+      }
+    }
+    // Refresh user data on dashboard load
+    refreshUser();
+  }, [setUser]);
+
+  
   return (
-    <div className="container mt-5">
+    <div className="container mt-2">
       {message && (
         <div className="alert alert-info" role="alert">
           {message}
         </div>
+        
       )}
-      <div className="d-flex justify-content-between ">
-        <div className="w-75">
+      <AddFundsButton />
+      <div className="d-flex col justify-content-between mt-4 ">
+        <div className="w-100">
         <DashboardTabs />
         
         </div>
-        <div className="w-25 border border-primary ">
-bas
-        </div>
+        
       
       </div>
       
-      {/* Your dashboard content */}
+      {/*dashboard content */}
     </div>
   );
 }

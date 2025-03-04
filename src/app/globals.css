@@ -21,7 +21,7 @@ h1, h2 {
 }
 
 body {
-  background: radial-gradient(circle, rgb(29, 3, 54) 0%, rgb(17, 2, 41) 35%, rgb(7, 0, 14) 100%);
+  background: radial-gradient(circle, rgb(13, 2, 24) 0%, rgb(12, 1, 29) 5%, rgb(7, 0, 14) 100%);
   min-height: 100vh;
   margin: 0;
 }

@@ -11,7 +11,7 @@ export default function DashboardTabs() {
         <Tab eventKey="cryptos" title="Top 100 Cryptos">
           <TopCryptos />
         </Tab>
-        <Tab eventKey="wallet" title="Wallet Holdings">
+        <Tab eventKey="wallet" title="Wallet">
         <p>Content for TBD tab.</p>
         </Tab>
         <Tab eventKey="tbd" title="TBD">

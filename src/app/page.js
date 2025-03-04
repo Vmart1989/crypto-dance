@@ -13,8 +13,8 @@ export default function Home() {
   return (
     <div>
       <main className="container mt-5 mb-5">
-        <div className="row">
-          <div className="p-0 col-12 col-md-8 me-5 border rounded border-primary-subtle h-100">
+        <div className="row justify-content-between">
+          <div className="p-0 col-12 col-md-8 border rounded border-primary-subtle h-100">
             <div>
               <TopCryptos />
             </div>
