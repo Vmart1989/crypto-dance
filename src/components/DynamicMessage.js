@@ -4,12 +4,32 @@ import { useUser } from "@/context/UserContext";
 import { useCurrency } from "@/context/CurrencyContext";
 import { usePathname } from "next/navigation";
 import { useConversionRate } from "@/hooks/useConversionRate";
+import Link from "next/link";
+
 
 export default function DynamicMessage() {
   const { user } = useUser();
   const { currency } = useCurrency();
   const { rate } = useConversionRate(currency);
   const pathname = usePathname();
+
+  // If on a coin details page, return a "Back to Dashboard" link
+  if (pathname.startsWith("/dashboard/coin/")) {
+    return (
+      <div className="w-100 d-flex justify-content-end">
+      <div className="mb-3">
+        <Link
+          href="/dashboard"
+          className="btn btn-outline-primary"
+        >
+          <i className="bi bi-speedometer2 me-2"></i>
+          Back to Dashboard
+        </Link>
+      </div>
+      </div>
+      
+    );
+  }
 
   // Helper functions
   const convertValue = (value) => Number(value) * rate;
@@ -28,10 +48,16 @@ export default function DynamicMessage() {
       ? user.wallet.fiatBalance
       : 0;
     return (
-      <h3>
-        Your Wallet Balance: {symbol} {formatCurrency(convertValue(fiatBalance), currency)}
+      <div className="d-flex justify-content-between w-100">
+      <h3 >
+        Your Fiat Balance: {symbol}{formatCurrency(convertValue(fiatBalance), currency)}
+        
       </h3>
+      <h3>Your Crypto Balance: </h3>
+      </div>
+      
     );
+    
   }
   return <h3>Dive into the Crypto World without risks!</h3>;
 }

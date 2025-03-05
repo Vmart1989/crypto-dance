@@ -47,7 +47,7 @@ export default function AddFundsModal() {
 
   return (
     <>
-      <button className="btn btn-secondary" onClick={handleOpen}>
+      <button className="btn btn-primary" onClick={handleOpen}>
         Add Funds
       </button>
 
@@ -55,7 +55,7 @@ export default function AddFundsModal() {
         <>
           <div className="modal show" style={{ display: "block" }} tabIndex="-1">
             <div className="modal-dialog">
-              <div className="modal-content">
+              <div className="modal-content bg-dark">
                 <div className="modal-header">
                   <h5 className="modal-title">Add Funds</h5>
                   <button

@@ -7,6 +7,7 @@ import { formatSuboneNumber } from "../utils/formatNumbers";
 import { useConversionRate } from "../hooks/useConversionRate";
 import { useCurrency } from "../context/CurrencyContext";
 import { sortCryptos } from "../utils/sortCryptos";
+import Link from "next/link";
 
 export default function CryptoTicker() {
   const [cryptos, setCryptos] = useState([]);
@@ -36,7 +37,7 @@ export default function CryptoTicker() {
   const convertValue = (value) => Number(value) * rate;
   const symbol = currency === "USD" ? "$" : "€";
 
-  // First, define the filtered list based on the search query
+  // filter list based on the search query
   const filteredCryptos = useMemo(() => {
     const query = search.toLowerCase();
     return cryptos.filter(
@@ -46,7 +47,7 @@ export default function CryptoTicker() {
     );
   }, [cryptos, search]);
 
-  // Then, compute the sorted list from cryptos using sortConfig
+  // compute the sorted list from cryptos using sortConfig
   const sortedCryptos = useMemo(() => {
     return sortCryptos(cryptos, sortConfig);
   }, [cryptos, sortConfig]);
@@ -127,6 +128,8 @@ export default function CryptoTicker() {
             <tr key={crypto.id}>
               <td className="ps-2 pb-2 text-primary">{crypto.rank}</td>
               <td className="pb-2">
+              <Link className="text-decoration-none link-light" href={`/dashboard/coin/${crypto.id}`}>
+              
                 <img
                   src={`https://assets.coincap.io/assets/icons/${crypto.symbol.toLowerCase()}@2x.png`}
                   alt={crypto.name}
@@ -137,6 +140,8 @@ export default function CryptoTicker() {
                   }}
                 />{" "}
                 {crypto.name}
+                
+            </Link>
               </td>
               <td className="d-none d-md-table-cell pb-2">
                 {symbol} {formatLargeNumber(convertValue(crypto.marketCapUsd))}

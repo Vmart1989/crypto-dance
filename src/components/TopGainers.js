@@ -77,7 +77,7 @@ export default function TopGainers() {
                 <td
                   className={
                     Number(crypto.changePercent24Hr) > 0
-                      ? "text-success"
+                      ? "text-info"
                       : "text-danger"
                   }
                 >

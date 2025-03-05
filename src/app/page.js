@@ -44,7 +44,7 @@ export default function Home() {
               )}
             </div>
             <div className="border rounded border-primary-subtle p-2 mt-5 bg-dark">
-              <h3 className="mb-4 text-primary">Today's Top Gainers</h3>
+              <h3 className="mb-2 text-light">Today's Top Gainers</h3>
               <p className="text-primary fs-6 lh-1">
                 Among Current Top 100 by Market Cap
               </p>
