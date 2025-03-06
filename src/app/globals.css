@@ -36,6 +36,28 @@ body a {
   color: #f0e7e7 !important;
 }
 
+.tooltip-text{
+  position: relative;
+  cursor: pointer;
+  
+  
+}
+.tooltip-text[title]:hover:after {
+  content: attr(title);
+  position: absolute;
+  top: -100%;
+  left: -50px;
+  font-size: 0.7em;
+  background: black;
+  text-align: center;
+  padding: 5px;
+  font-weight: 400;
+  width: auto;
+  border-radius: 10px;
+  width:max-content;
+}
+
+
 .btn-primary {
   --bs-btn-color: #fff;
   --bs-btn-bg: #671ae4;
@@ -83,6 +105,7 @@ body a {
   border: none;
 }
 
+
 .nav-tabs {
   border-color: var(--bs-primary-border-subtle);
 }
@@ -90,8 +113,9 @@ body a {
 
 
 .custom-tabs .nav-link.active {
-  color: var(--bs-primary);  /* Text color for the active tab */
+  color: white;  /* Text color for the active tab */
   font-weight: bold;
+
 }
 
 .modal-header, .modal-footer  {

@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useConversionRate } from "@/hooks/useConversionRate";
 import { useCurrency } from "@/context/CurrencyContext";
+import PriceHistoryChart from "@/components/PriceHistoryChart";
 
 
 
@@ -16,13 +17,16 @@ export default function CoinDetails() {
   const [loading, setLoading] = useState(true);
   const { currency } = useCurrency();
   const { rate } = useConversionRate(currency);
-
+  
+  
   // Fetch coin details and 7-day history
   useEffect(() => {
     async function fetchCoinData() {
       try {
         // Fetch coin details
-        const resCoin = await fetch(`https://api.coincap.io/v2/assets/${coinId}`);
+        const resCoin = await fetch(
+          `https://api.coincap.io/v2/assets/${coinId}`
+        );
         const coinJson = await resCoin.json();
 
         // Fetch daily history for the past 7 days (default endpoint might return more data)
@@ -56,7 +60,9 @@ export default function CoinDetails() {
         );
         const yearJson = await resYear.json();
         if (yearJson.data && yearJson.data.length > 0) {
-          const maxPrice = Math.max(...yearJson.data.map((point) => Number(point.priceUsd)));
+          const maxPrice = Math.max(
+            ...yearJson.data.map((point) => Number(point.priceUsd))
+          );
           setYearlyHigh(maxPrice);
         }
       } catch (err) {
@@ -75,6 +81,9 @@ export default function CoinDetails() {
     return num >= 1 ? num.toFixed(2) : num.toFixed(7);
   };
 
+ 
+  
+
   if (loading) {
     return (
       <div className="container mt-5">
@@ -89,7 +98,7 @@ export default function CoinDetails() {
   return (
     <div className="container mt-2">
       <div className="p-4 bg-dark rounded-2">
-        <div className="d-flex justify-content-between align-items-center mb-2 w-100">
+        <div className="d-flex flex-column flex-md-row justify-content-between mb-2 w-100">
           <div className="d-flex align-items-center">
             <img
               src={`https://assets.coincap.io/assets/icons/${coin.symbol.toLowerCase()}@2x.png`}
@@ -100,7 +109,7 @@ export default function CoinDetails() {
               {coin.name} ({coin.symbol})
             </h2>
           </div>
-          <h4 className="fs-3">
+          <h4 className="fs-3 mt-3 mt-md-0">
             {symbol}
             {formatPrice(convertValue(coin.priceUsd))}{" "}
             <span
@@ -112,52 +121,69 @@ export default function CoinDetails() {
             >
               ({Number(coin.changePercent24Hr).toFixed(2)}%)
             </span>
+            <i className="bi bi-question-circle ms-1 tooltip-text"
+            title="Change in 24h"></i>
           </h4>
         </div>
       </div>
-      <div className="p-4 bg-dark rounded-2 d-flex justify-content-between">
+      <div className="p-4 flex-column flex-md-row bg-dark rounded-2 d-flex justify-content-between">
         <div className="fs-5">
-        <button type="button" className="btn fs-5 m-0 p-0" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Tooltip on top">
-  Market Cap
-</button>{" "}
-          <p>{symbol}{Number(convertValue(coin.marketCapUsd)).toLocaleString()}</p>
+          <strong
+            
+          >
+            Market Cap
+            <i className="bi bi-question-circle ms-1 tooltip-text"
+            title="Price × Circulating Supply"></i>
+          </strong>
+          <p>
+            {symbol}
+            {Number(convertValue(coin.marketCapUsd)).toLocaleString()}
+          </p>
         </div>
         <div className="fs-5">
-          <strong>Volume (24h):</strong>{" "}
-          <p>{symbol}{Number(convertValue(coin.volumeUsd24Hr)).toLocaleString()}</p>
+          <strong>Volume (24h)
+          <i className="bi bi-question-circle ms-1 tooltip-text"
+            title="Sum of all trade values in 24 hours"></i>
+          </strong>
+          <p>
+            {symbol}
+            {Number(convertValue(coin.volumeUsd24Hr)).toLocaleString()}
+          </p>
         </div>
         <div className="fs-5">
-          <strong>Supply:</strong>{" "}
-          <p>{symbol}{Number(convertValue(coin.supply)).toLocaleString()}</p>
+          <strong>Supply
+          <i className="bi bi-question-circle ms-1 tooltip-text"
+            title="Total coins in circulation"></i>
+          </strong>
+          <p>
+            {symbol}
+            {Number(convertValue(coin.supply)).toLocaleString()}
+          </p>
         </div>
         <div className="fs-5">
-          <strong>Yearly High:</strong>{" "}
+          <strong>Yearly High
+          <i className="bi bi-question-circle ms-1 tooltip-text"
+            title="Highest price over last 365 days"></i>
+          </strong>
           {yearlyHigh ? (
-            <p>{symbol}{formatPrice(convertValue(yearlyHigh))} (+{(100-coin.priceUsd/yearlyHigh*100).toFixed(1)}%)</p>
+            <p>
+              {symbol}
+              {formatPrice(convertValue(yearlyHigh))} (+
+              {(100 - (coin.priceUsd / yearlyHigh) * 100).toFixed(1)}%)
+            </p>
           ) : (
             <p>Data not available</p>
           )}
         </div>
       </div>
-      {/* Chart Section - replace with an actual chart component as needed */}
-      <div className="mt-4 p-4 bg-dark rounded-2 border border-primary">
-        <h3>Daily Price History (7 Days)</h3>
-        {chartData.length > 0 ? (
-          <ul>
-            {chartData.slice(-7).map((point) => (
-              <li key={point.time}>
-                {new Date(point.time).toLocaleDateString()}: {symbol}
-                {Number(convertValue(point.priceUsd)).toLocaleString("en-US", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>No historical data available.</p>
-        )}
-      </div>
+     {/* Render the chart component */}
+     <PriceHistoryChart
+        coinId={coinId}
+        convertValue={convertValue}
+        coin={coin}
+        symbol={symbol}
+        
+      />
     </div>
   );
 }

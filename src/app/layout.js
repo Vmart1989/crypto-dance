@@ -9,6 +9,8 @@ import { UserProvider } from "../context/UserContext";
 import DynamicMessage from "@/components/DynamicMessage";
 import UserHeader from "@/components/UserHeader";
 
+
+
 const teko = Teko({
   subsets: ["latin"],
   weight: ["400", "700"], // Adjust weights as needed
@@ -125,6 +127,7 @@ export default function RootLayout({ children }) {
             </div>
           </UserProvider>
         </CurrencyProvider>
+
       </body>
     </html>
   );

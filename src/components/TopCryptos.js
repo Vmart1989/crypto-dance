@@ -101,7 +101,7 @@ export default function CryptoTicker() {
         <thead className="sticky-top">
           <tr>
             <th className="p-1 pb-3"></th>
-            <th className="p-1 pb-3">Today's top 100 Cryptocurrencies</th>
+            <th className="p-1 pb-3 ">Today's top 100 Cryptocurrencies</th>
             <th
               className="d-none d-md-table-cell p-1 pb-3"
               onClick={() => handleSort("marketCapUsd")}
@@ -120,7 +120,7 @@ export default function CryptoTicker() {
             >
               Price{renderSortArrow("priceUsd")}
             </th>
-            <th className="p-1 pb-3">24h Change</th>
+            <th className="p-1 pb-3 ">24h Change</th>
           </tr>
         </thead>
         <tbody>
@@ -128,20 +128,21 @@ export default function CryptoTicker() {
             <tr key={crypto.id}>
               <td className="ps-2 pb-2 text-primary">{crypto.rank}</td>
               <td className="pb-2">
-              <Link className="text-decoration-none link-light" href={`/dashboard/coin/${crypto.id}`}>
-              
-                <img
-                  src={`https://assets.coincap.io/assets/icons/${crypto.symbol.toLowerCase()}@2x.png`}
-                  alt={crypto.name}
-                  width="24"
-                  height="24"
-                  onError={(e) => {
-                    e.target.style.display = "none";
-                  }}
-                />{" "}
-                {crypto.name}
-                
-            </Link>
+                <Link
+                  className="text-decoration-none link-light"
+                  href={`/dashboard/coin/${crypto.id}`}
+                >
+                  <img
+                    src={`https://assets.coincap.io/assets/icons/${crypto.symbol.toLowerCase()}@2x.png`}
+                    alt={crypto.name}
+                    width="24"
+                    height="24"
+                    onError={(e) => {
+                      e.target.style.display = "none";
+                    }}
+                  />{" "}
+                  {crypto.name}
+                </Link>
               </td>
               <td className="d-none d-md-table-cell pb-2">
                 {symbol} {formatLargeNumber(convertValue(crypto.marketCapUsd))}
