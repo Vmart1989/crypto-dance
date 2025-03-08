@@ -7,7 +7,9 @@ import { formatSuboneNumber } from "../utils/formatNumbers";
 import { useConversionRate } from "../hooks/useConversionRate";
 import { useCurrency } from "../context/CurrencyContext";
 import { sortCryptos } from "../utils/sortCryptos";
+import BuyCoinModal from "./BuyCoinModal";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function CryptoTicker() {
   const [cryptos, setCryptos] = useState([]);
@@ -18,6 +20,7 @@ export default function CryptoTicker() {
     key: "rank",
     direction: "asc",
   });
+  const pathname = usePathname();
 
   useEffect(() => {
     async function fetchCryptos() {
@@ -40,6 +43,7 @@ export default function CryptoTicker() {
   // filter list based on the search query
   const filteredCryptos = useMemo(() => {
     const query = search.toLowerCase();
+    if (!Array.isArray(cryptos)) return [];
     return cryptos.filter(
       (crypto) =>
         crypto.name.toLowerCase().includes(query) ||
@@ -101,7 +105,7 @@ export default function CryptoTicker() {
         <thead className="sticky-top">
           <tr>
             <th className="p-1 pb-3"></th>
-            <th className="p-1 pb-3 ">Today's top 100 Cryptocurrencies</th>
+            <th className="p-1 pb-3 "></th>
             <th
               className="d-none d-md-table-cell p-1 pb-3"
               onClick={() => handleSort("marketCapUsd")}
@@ -126,7 +130,19 @@ export default function CryptoTicker() {
         <tbody>
           {displayCryptos.map((crypto) => (
             <tr key={crypto.id}>
-              <td className="ps-2 pb-2 text-primary">{crypto.rank}</td>
+              <td className="ps-2 pb-2 text-primary">
+                {/* Conditionally render the buy icon only when on the dashboard */}
+                {pathname === "/dashboard" ? (
+                  <BuyCoinModal
+                    coin={crypto}
+                    convertValue={convertValue}
+                    symbol={symbol}
+                    image={`https://assets.coincap.io/assets/icons/${crypto.symbol.toLowerCase()}@2x.png`}
+                  />
+                ): (
+                  crypto.rank
+                )}
+              </td>
               <td className="pb-2">
                 <Link
                   className="text-decoration-none link-light"

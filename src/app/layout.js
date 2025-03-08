@@ -83,7 +83,7 @@ export default function RootLayout({ children }) {
                 </ul>
               </header>
               {/* Dynamic header text */}
-              <div className="d-flex justify-content-between align-items-center">
+              <div className="d-flex justify-content-between align-items-center m-2">
                 <DynamicMessage />
               </div>
             </div>

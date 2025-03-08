@@ -47,7 +47,7 @@ export default function AddFundsModal() {
 
   return (
     <>
-      <button className="btn btn-primary" onClick={handleOpen}>
+      <button className="btn btn-primary ms-2" onClick={handleOpen}>
         Add Funds
       </button>
 

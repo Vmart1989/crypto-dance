@@ -49,11 +49,17 @@ export default function DynamicMessage() {
       : 0;
     return (
       <div className="d-flex justify-content-between w-100">
-      <h3 >
-        Your Fiat Balance: {symbol}{formatCurrency(convertValue(fiatBalance), currency)}
-        
+      <div>
+      <h3>
+        Fiat Balance
       </h3>
-      <h3>Your Crypto Balance: </h3>
+      <h2>{symbol}{formatCurrency(convertValue(fiatBalance), currency)}</h2>
+      </div>
+      
+      <div>
+      <h3>Crypto Balance </h3>
+      <h2>{symbol}56895 (+5%)</h2>
+      </div>
       </div>
       
     );

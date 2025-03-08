@@ -24,7 +24,12 @@ ChartJS.register(
   Legend
 );
 
-export default function PriceHistoryChart({ coinId, convertValue, coin, symbol }) {
+export default function PriceHistoryChart({
+  coinId,
+  convertValue,
+  coin,
+  symbol,
+}) {
   const [chartData, setChartData] = useState([]);
   const [timeRange, setTimeRange] = useState("week");
   const [loading, setLoading] = useState(true);
@@ -67,6 +72,8 @@ export default function PriceHistoryChart({ coinId, convertValue, coin, symbol }
           `https://api.coincap.io/v2/assets/${coinId}/history?interval=${interval}&start=${start}&end=${end}`
         );
         const data = await res.json();
+        // data.data might be undefined or not an array
+        setChartData(Array.isArray(data.data) ? data.data : []);
         setChartData(data.data);
         setLoading(false);
       } catch (err) {
@@ -78,15 +85,29 @@ export default function PriceHistoryChart({ coinId, convertValue, coin, symbol }
   }, [coinId, timeRange]);
 
   // Prepare chart labels and prices
-  const labels = chartData.map((point) =>
-    new Date(point.time).toLocaleDateString()
-  );
+  const labels = chartData.map((point) => {
+    const dateObj = new Date(point.time);
+    if (timeRange === "day") {
+      // For the day range, show hour:minute (e.g. "10:30 AM")
+      return dateObj.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } else {
+      // For week, month, year, show just the date (e.g. "7/30/2025")
+      return dateObj.toLocaleDateString();
+    }
+  });
   const prices = chartData.map((point) => convertValue(point.priceUsd));
 
   // Compute high and low for the current selection
   const highPrice = prices.length ? Math.max(...prices) : null;
+  //console.log("high " + highPrice);
   const lowPrice = prices.length ? Math.min(...prices) : null;
-  const averagePrice = prices.length ? prices.reduce((sum, price) => sum + price, 0) / prices.length : null;
+  const averagePrice = prices.length
+    ? prices.reduce((sum, price) => sum + price, 0) / prices.length
+    : null;
+
 
   const data = {
     labels,
@@ -122,28 +143,36 @@ export default function PriceHistoryChart({ coinId, convertValue, coin, symbol }
       <div className="btn-group mb-3" role="group">
         <button
           type="button"
-          className={`btn btn-outline-primary ${timeRange === "day" ? "active" : ""}`}
+          className={`btn btn-outline-primary ${
+            timeRange === "day" ? "active" : ""
+          }`}
           onClick={() => setTimeRange("day")}
         >
           Day
         </button>
         <button
           type="button"
-          className={`btn btn-outline-primary ${timeRange === "week" ? "active" : ""}`}
+          className={`btn btn-outline-primary ${
+            timeRange === "week" ? "active" : ""
+          }`}
           onClick={() => setTimeRange("week")}
         >
           Week
         </button>
         <button
           type="button"
-          className={`btn btn-outline-primary ${timeRange === "month" ? "active" : ""}`}
+          className={`btn btn-outline-primary ${
+            timeRange === "month" ? "active" : ""
+          }`}
           onClick={() => setTimeRange("month")}
         >
           Month
         </button>
         <button
           type="button"
-          className={`btn btn-outline-primary ${timeRange === "year" ? "active" : ""}`}
+          className={`btn btn-outline-primary ${
+            timeRange === "year" ? "active" : ""
+          }`}
           onClick={() => setTimeRange("year")}
         >
           Year
@@ -161,7 +190,7 @@ export default function PriceHistoryChart({ coinId, convertValue, coin, symbol }
               position: "absolute",
               top: "10px",
               right: "10px",
-            
+
               color: "#fff",
               padding: "5px 10px",
               borderRadius: "5px",
@@ -172,16 +201,29 @@ export default function PriceHistoryChart({ coinId, convertValue, coin, symbol }
           >
             {highPrice !== null && lowPrice !== null && (
               <>
-              <div className="d-flex " >
-                <div className="me-3">
-                  <span>High:</span> {symbol}{highPrice.toLocaleString()}
-                </div>
-                <div className="me-3">
-                  <span>Low:</span> {symbol}{lowPrice.toLocaleString()}
-                </div>
-                <div>
-                  <span>Average:</span> {symbol}{averagePrice.toLocaleString()}
-                </div>
+                <div className="d-md-flex">
+                <div className="me-md-3">
+  <span>High:</span> {symbol}
+  {highPrice > 0.0099
+    ? highPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+    : highPrice.toLocaleString(undefined, { minimumFractionDigits: 7, maximumFractionDigits: 7 })
+  }
+</div>
+
+                  <div className="me-md-3">
+                    <span>Low:</span> {symbol}
+                    {lowPrice > 0.0099
+    ? lowPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+    : lowPrice.toLocaleString(undefined, { minimumFractionDigits: 7, maximumFractionDigits: 7 })
+  }
+                  </div>
+                  <div>
+                    <span>Average:</span> {symbol}
+                    {averagePrice > 0.0099
+    ? averagePrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+    : averagePrice.toLocaleString(undefined, { minimumFractionDigits: 7, maximumFractionDigits: 7 })
+  }
+                  </div>
                 </div>
               </>
             )}

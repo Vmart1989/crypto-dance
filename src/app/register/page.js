@@ -39,7 +39,10 @@ export default function RegisterForm() {
   };
 
   return (
-    <div className="container border border-primary p-3 w-25 my-5 text-center">
+    <div className="row justify-content-center">
+    
+    
+    <div className="col-9 col-md-6 border border-primary rounded p-3 my-5 text-center">
       <h3>Register Now For Full Access</h3>
       <form onSubmit={handleRegister}>
         <div className="mb-3">
@@ -81,5 +84,7 @@ export default function RegisterForm() {
         </button>
       </form>
     </div>
+    </div>
+
   );
 }
