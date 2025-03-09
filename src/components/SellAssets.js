@@ -6,6 +6,7 @@ import { useCurrency } from "@/context/CurrencyContext";
 import { useConversionRate } from "@/hooks/useConversionRate";
 import { useState, useEffect } from "react";
 import SellCoinModal from "./SellCoinModal";
+import CryptoBalance from "./CryptoBalance";
 
 export default function SellAssets() {
   const { user } = useUser();
@@ -13,6 +14,7 @@ export default function SellAssets() {
   const { rate } = useConversionRate(currency);
   const symbol = currency === "USD" ? "$" : "€";
   const [assetsData, setAssetsData] = useState([]);
+  
 
   // Fetch current coin data for each asset the user owns
   useEffect(() => {
@@ -54,14 +56,24 @@ export default function SellAssets() {
     });
   };
 
+  // Create a sorted copy of assetsData by highest current fiat value
+  const sortedAssets = [...assetsData].sort((a, b) => {
+    const fiatA = a.balance * a.currentPriceUsd * rate;
+    const fiatB = b.balance * b.currentPriceUsd * rate;
+    return fiatB - fiatA;
+  });
+
+  
   return (
+
     <div className={styles.tickerContainer}>
+        
       <h3 className="mt-5">Crypto Holdings</h3>
-      {assetsData.length > 0 ? (
+      {sortedAssets.length > 0 ? (
         <table className="w-100">
           <thead className="sticky-top">
             <tr>
-              <th></th> {/* Sell icon column */}
+              <th></th> 
               <th></th>
               <th>Amount Owned</th>
               <th>Current Value</th>
@@ -69,7 +81,7 @@ export default function SellAssets() {
             </tr>
           </thead>
           <tbody>
-            {assetsData.map((asset) => {
+            {sortedAssets.map((asset) => {
               // Calculate the current fiat value of this asset
               const fiatValue = asset.balance * asset.currentPriceUsd * rate;
               return (
@@ -80,7 +92,7 @@ export default function SellAssets() {
                   <td>
                     <img
                       src={`https://assets.coincap.io/assets/icons/${asset.assetSymbol.toLowerCase()}@2x.png`}
-                      alt={asset.name}
+                      alt={asset.assetName}
                       style={{
                         width: "30px",
                         height: "30px",
@@ -113,6 +125,9 @@ export default function SellAssets() {
       ) : (
         <p>You don't own any crypto assets yet.</p>
       )}
+      <h3 className="mt-5">
+        <CryptoBalance user={user} symbol={symbol} />
+      </h3>
     </div>
   );
 }

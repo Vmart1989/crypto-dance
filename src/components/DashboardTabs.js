@@ -6,7 +6,7 @@ import SellAssets from "./SellAssets";
 
 export default function DashboardTabs() {
   return (
-    <div className="container mt-1">
+    <div className="container ">
       <Tabs
         defaultActiveKey="cryptos"
         id="dashboard-tabs"
@@ -20,10 +20,10 @@ export default function DashboardTabs() {
         >
           <TopCryptos />
         </Tab>
-        <Tab eventKey="wallet" title="SELL">
+        <Tab eventKey="wallet" title="SELL" className="border-start border-end border-bottom border-primary">
           <SellAssets />
         </Tab>
-        <Tab eventKey="tbd" title="WALLET">
+        <Tab eventKey="tbd" title="WALLET" className="border-start border-end border-bottom border-primary">
           <p>Content for TBD tab.</p>
         </Tab>
       </Tabs>

@@ -37,7 +37,7 @@ export default function SellCoinModal({ asset, currency }) {
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
-          coinSymbol: asset.symbol, // use symbol for selling
+          coinId: asset.symbol, // use id for selling
           amount,
           price: asset.currentPriceUsd,
           fiatRevenue,
@@ -106,7 +106,7 @@ export default function SellCoinModal({ asset, currency }) {
                 </div>
                 <div className="modal-body">
                   <p>
-                    <strong>Your {asset.symbol} Balance:</strong>{" "}
+                    <strong>Your {asset.assetName} Balance:</strong>{" "}
                     {asset.balance}
                   </p>
                   <p>

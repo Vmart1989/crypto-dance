@@ -96,7 +96,7 @@ export default function CoinDetails() {
         <div className="d-flex flex-column flex-md-row justify-content-between mb-2 w-100">
           <div className="d-flex align-items-center">
             <img
-              src={`https://assets.coincap.io/assets/icons/${coin.symbol.toLowerCase()}@2x.png`}
+              src={`https://assets.coincap.io/assets/icons/${coin.symbol.toLowerCase() || "default"}@2x.png`}
               alt={coin.name}
               style={{ width: "50px", height: "50px", marginRight: "1rem" }}
             />
