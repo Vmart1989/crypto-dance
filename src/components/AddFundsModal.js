@@ -54,13 +54,13 @@ export default function AddFundsModal() {
       {showModal && (
         <>
           <div className="modal show" style={{ display: "block" }} tabIndex="-1">
-            <div className="modal-dialog">
+            <div className="modal-dialog ">
               <div className="modal-content bg-dark">
                 <div className="modal-header">
                   <h5 className="modal-title">Add Funds</h5>
                   <button
                     type="button"
-                    className="btn-close"
+                    className="btn-close btn-close-white"
                     aria-label="Close"
                     onClick={handleClose}
                   ></button>

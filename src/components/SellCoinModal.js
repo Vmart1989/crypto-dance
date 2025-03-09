@@ -3,83 +3,77 @@
 import { useState } from "react";
 import { useUser } from "@/context/UserContext";
 import { useCurrency } from "@/context/CurrencyContext";
-import { usePathname } from "next/navigation";
 
-export default function BuyCoinModal({ coin, convertValue, symbol }) {
+export default function SellCoinModal({ asset, currency }) {
   const { user, setUser } = useUser();
-  const pathname = usePathname();
+  const { currency: curr } = useCurrency(); // this should match the passed currency; use if needed
+  const symbol = currency === "USD" ? "$" : "€";
   const [showModal, setShowModal] = useState(false);
-  const [buyAmount, setBuyAmount] = useState("");
+  const [sellAmount, setSellAmount] = useState("");
   const [feedback, setFeedback] = useState("");
-  const { currency } = useCurrency();
 
   const handleOpen = () => setShowModal(true);
   const handleClose = () => {
     setShowModal(false);
-    setBuyAmount("");
+    setSellAmount("");
     setFeedback("");
   };
 
-  const handleBuy = async () => {
-    const amount = parseFloat(buyAmount);
+  const handleSell = async () => {
+    const amount = parseFloat(sellAmount);
     if (isNaN(amount) || amount <= 0) {
       alert("Please enter a valid positive amount.");
       return;
     }
-
-    // Calculate total fiat cost based on the coin's current price (converted)
-    const fiatCost = amount * convertValue(coin.priceUsd);
-    if (fiatCost > user.wallet.fiatBalance) {
-      alert("Insufficient funds for this purchase.");
+    if (amount > asset.balance) {
+      alert("You don't have that many coins to sell.");
       return;
     }
-
+    // Calculate revenue: amount * current price in USD
+    const fiatRevenue = amount * asset.currentPriceUsd;
     try {
-      const res = await fetch("/api/transactions/buy", {
+      const res = await fetch("/api/transactions/sell", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include", // <-- Ensure cookies are included
+        credentials: "include",
         body: JSON.stringify({
-          coinId: coin.id,
+          coinSymbol: asset.symbol, // use symbol for selling
           amount,
-          price: coin.priceUsd, // coin's price in USD
-          fiatCost,
-          fiatCurrency: currency,
+          price: asset.currentPriceUsd,
+          fiatRevenue,
+          fiatCurrency: currency, // send the current fiat currency
         }),
       });
-      
       const data = await res.json();
-
       if (!res.ok) {
-        alert(data.error || "Failed to complete purchase.");
+        alert(data.error || "Failed to complete sale.");
       } else {
-        // Update the UserContext with the new wallet and crypto asset data
+        // Update UserContext with the updated wallet and crypto assets
         setUser((prev) => ({
           ...prev,
           wallet: data.updatedWallet,
           cryptoAssets: data.updatedCryptoAssets,
         }));
-        setFeedback("Purchase successful!");
+        setFeedback("Sale successful!");
         setTimeout(() => setFeedback(""), 5000);
         handleClose();
       }
     } catch (error) {
-      console.error("Purchase error:", error);
+      console.error("Sale error:", error);
       alert("An unexpected error occurred.");
     }
   };
 
   return (
     <>
-      {pathname.startsWith("/dashboard/coin/") ? (
-        <button className="btn btn-primary mt-2" onClick={handleOpen}>
-          Buy {coin.symbol}
-        </button>
-      ) : (
-        <span onClick={handleOpen} style={{ cursor: "pointer" }} title="Buy Coin">
-          <i className="bi bi-bag-plus fs-4 ms-2 link-primary"></i>
-        </span>
-      )}
+      {/* Sell icon */}
+      <span
+        onClick={handleOpen}
+        style={{ cursor: "pointer" }}
+        title="Sell Coin"
+      >
+        <i className="bi bi-bag-x fs-4 ms-2 link-primary"></i>
+      </span>
 
       {showModal && (
         <>
@@ -93,19 +87,16 @@ export default function BuyCoinModal({ coin, convertValue, symbol }) {
                 <div className="modal-header">
                   <div className="d-flex align-items-center">
                     <img
-                      src={`https://assets.coincap.io/assets/icons/${coin.symbol.toLowerCase()}@2x.png`}
-                      alt={coin.name}
+                      src={`https://assets.coincap.io/assets/icons/${asset.assetSymbol.toLowerCase()}@2x.png`}
+                      alt={asset.symbol}
                       style={{
                         width: "40px",
                         height: "40px",
                         marginRight: "0.5rem",
                       }}
                     />
-                    <h5 className="modal-title">
-                      Buy {coin.name} ({coin.symbol})
-                    </h5>
+                    <h5 className="modal-title">Sell {asset.assetName}</h5>
                   </div>
-
                   <button
                     type="button"
                     className="btn-close btn-close-white"
@@ -115,40 +106,44 @@ export default function BuyCoinModal({ coin, convertValue, symbol }) {
                 </div>
                 <div className="modal-body">
                   <p>
-                    <strong>Your Fiat Balance: </strong> {symbol}
-                    {user.wallet.fiatBalance.toLocaleString(undefined, {
+                    <strong>Your {asset.symbol} Balance:</strong>{" "}
+                    {asset.balance}
+                  </p>
+                  <p>
+                    <strong>1 {asset.assetSymbol} = </strong> {symbol}
+                    {Number(asset.currentPriceUsd).toLocaleString(undefined, {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
                     })}
                   </p>
-                  <p>
-                    <strong>1 {coin.symbol} = </strong> {symbol}
-                    {convertValue(coin.priceUsd).toLocaleString(undefined, {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: coin.priceUsd < 0.099 ? 7 : 2,
-                    })}
-                  </p>
                   <div className="mb-3">
-                    <label htmlFor="buyAmount" className="form-label">
-                      Amount to Buy
+                    <label htmlFor="sellAmount" className="form-label">
+                      Amount to Sell
                     </label>
                     <input
                       type="number"
                       className="form-control"
-                      id="buyAmount"
-                      value={buyAmount}
-                      onChange={(e) => setBuyAmount(e.target.value)}
+                      id="sellAmount"
+                      value={sellAmount}
+                      onChange={(e) => setSellAmount(e.target.value)}
                       min="0"
+                      max={asset.balance}
                     />
                   </div>
                   <p>
-                    <strong>Total Cost:</strong> {symbol}{" "}
-                    {(
-                      convertValue(coin.priceUsd) * parseFloat(buyAmount || 0)
-                    ).toLocaleString(undefined, {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
+                    <strong>Total Revenue:</strong>{" "}
+                    {parseFloat(sellAmount) > asset.balance ? (
+                      <span className="text-danger">Insufficient balance</span>
+                    ) : (
+                      <span>
+                        {(
+                          asset.currentPriceUsd * parseFloat(sellAmount || 0)
+                        ).toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                      </span>
+                    )}
                   </p>
                 </div>
                 <div className="modal-footer">
@@ -161,10 +156,10 @@ export default function BuyCoinModal({ coin, convertValue, symbol }) {
                   </button>
                   <button
                     type="button"
-                    className="btn btn-primary"
-                    onClick={handleBuy}
+                    className="btn btn-danger"
+                    onClick={handleSell}
                   >
-                    Confirm Purchase
+                    Confirm Sale
                   </button>
                 </div>
                 {feedback && (
@@ -175,7 +170,6 @@ export default function BuyCoinModal({ coin, convertValue, symbol }) {
               </div>
             </div>
           </div>
-          {/* Modal backdrop */}
           <div className="modal-backdrop fade show"></div>
         </>
       )}

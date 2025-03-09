@@ -9,24 +9,26 @@ const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET;
 
 export async function POST(request) {
-  // Get token from cookies
-  const tokenObj = request.cookies.get("token");
-if (!tokenObj || !tokenObj.value) {
-  return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-}
+  // Retrieve token from cookies
+  const token = request.cookies.get("token");
+  if (!token) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     // Verify token and extract payload
     const { payload } = await jwtVerify(
-        tokenObj.value,
-        new TextEncoder().encode(JWT_SECRET)
-      );
+      token.value,
+      new TextEncoder().encode(JWT_SECRET)
+    );
+
     const userId = payload.userId;
 
     // Parse request body
-    const { coinId, amount, price, fiatCost } = await request.json();
+    const { coinId, amount, price, fiatCost, fiatCurrency } = await request.json();
 
     // Validate the request data
-    if (!coinId || !amount || !price || !fiatCost) {
+    if (!coinId || !amount || !price || !fiatCost || !fiatCurrency) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
@@ -59,10 +61,11 @@ if (!tokenObj || !tokenObj.value) {
     const transaction = await prisma.transaction.create({
       data: {
         type: "buy",
-        cryptoSymbol: coinId, // Assuming coinId matches the symbol; adjust if needed.
+        cryptoSymbol: coinId,
         amount: amount,
-        price: price,
+        price: Number(price), // Convert price to a number
         fiatAmount: fiatCost,
+        fiatCurrency,
         user: { connect: { id: userId } },
       },
     });
@@ -103,6 +106,7 @@ if (!tokenObj || !tokenObj.value) {
       updatedCryptoAssets,
     });
   } catch (error) {
+    console.log(error.stack);
     console.error("Error processing purchase:", error);
     return NextResponse.json(
       { error: "Failed to process purchase" },

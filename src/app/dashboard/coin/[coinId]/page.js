@@ -5,8 +5,7 @@ import { useState, useEffect } from "react";
 import { useConversionRate } from "@/hooks/useConversionRate";
 import { useCurrency } from "@/context/CurrencyContext";
 import PriceHistoryChart from "@/components/PriceHistoryChart";
-
-
+import BuyCoinModal from "@/components/BuyCoinModal";
 
 export default function CoinDetails() {
   const params = useParams();
@@ -17,8 +16,7 @@ export default function CoinDetails() {
   const [loading, setLoading] = useState(true);
   const { currency } = useCurrency();
   const { rate } = useConversionRate(currency);
-  
-  
+
   // Fetch coin details and 7-day history
   useEffect(() => {
     async function fetchCoinData() {
@@ -81,9 +79,6 @@ export default function CoinDetails() {
     return num >= 1 ? num.toFixed(2) : num.toFixed(7);
   };
 
- 
-  
-
   if (loading) {
     return (
       <div className="container mt-5">
@@ -121,19 +116,27 @@ export default function CoinDetails() {
             >
               ({Number(coin.changePercent24Hr).toFixed(2)}%)
             </span>
-            <i className="bi bi-question-circle ms-1 tooltip-text"
-            title="Change in 24h"></i>
+            <i
+              className="bi bi-question-circle ms-1 tooltip-text"
+              title="Change in 24h"
+            ></i>
           </h4>
         </div>
+        <BuyCoinModal
+          coin={coin}
+          convertValue={convertValue}
+          symbol={symbol}
+          image={`https://assets.coincap.io/assets/icons/${coin.symbol.toLowerCase()}@2x.png`}
+        />
       </div>
       <div className="p-4 flex-column flex-md-row bg-dark rounded-2 d-flex justify-content-between">
         <div className="fs-5">
-          <strong
-            
-          >
+          <strong>
             Market Cap
-            <i className="bi bi-question-circle ms-1 tooltip-text"
-            title="Price × Circulating Supply"></i>
+            <i
+              className="bi bi-question-circle ms-1 tooltip-text"
+              title="Price × Circulating Supply"
+            ></i>
           </strong>
           <p>
             {symbol}
@@ -141,9 +144,12 @@ export default function CoinDetails() {
           </p>
         </div>
         <div className="fs-5">
-          <strong>Volume (24h)
-          <i className="bi bi-question-circle ms-1 tooltip-text"
-            title="Sum of all trade values in 24 hours"></i>
+          <strong>
+            Volume (24h)
+            <i
+              className="bi bi-question-circle ms-1 tooltip-text"
+              title="Sum of all trade values in 24 hours"
+            ></i>
           </strong>
           <p>
             {symbol}
@@ -151,9 +157,12 @@ export default function CoinDetails() {
           </p>
         </div>
         <div className="fs-5">
-          <strong>Supply
-          <i className="bi bi-question-circle ms-1 tooltip-text"
-            title="Total coins in circulation"></i>
+          <strong>
+            Supply
+            <i
+              className="bi bi-question-circle ms-1 tooltip-text"
+              title="Total coins in circulation"
+            ></i>
           </strong>
           <p>
             {symbol}
@@ -161,9 +170,12 @@ export default function CoinDetails() {
           </p>
         </div>
         <div className="fs-5">
-          <strong>Yearly High
-          <i className="bi bi-question-circle ms-1 tooltip-text"
-            title="Highest price over last 365 days"></i>
+          <strong>
+            Yearly High
+            <i
+              className="bi bi-question-circle ms-1 tooltip-text"
+              title="Highest price over last 365 days"
+            ></i>
           </strong>
           {yearlyHigh ? (
             <p>
@@ -176,13 +188,12 @@ export default function CoinDetails() {
           )}
         </div>
       </div>
-     {/* Render the chart component */}
-     <PriceHistoryChart
+      {/* Render the chart component */}
+      <PriceHistoryChart
         coinId={coinId}
         convertValue={convertValue}
         coin={coin}
         symbol={symbol}
-        
       />
     </div>
   );

@@ -113,6 +113,10 @@ body a {
   margin: 0;
 }
 
+.link-primary:hover {
+  color:white !important;
+}
+
 
 
 .custom-tabs .nav-link.active {

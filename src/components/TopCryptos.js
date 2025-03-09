@@ -139,7 +139,7 @@ export default function CryptoTicker() {
                     symbol={symbol}
                     image={`https://assets.coincap.io/assets/icons/${crypto.symbol.toLowerCase()}@2x.png`}
                   />
-                ): (
+                ) : (
                   crypto.rank
                 )}
               </td>
@@ -161,10 +161,12 @@ export default function CryptoTicker() {
                 </Link>
               </td>
               <td className="d-none d-md-table-cell pb-2">
-                {symbol} {formatLargeNumber(convertValue(crypto.marketCapUsd))}
+                {symbol}
+                {formatLargeNumber(convertValue(crypto.marketCapUsd))}
               </td>
               <td className="pe-4 pb-2">
-                {symbol} {formatSuboneNumber(convertValue(crypto.priceUsd))}
+                {symbol}
+                {formatSuboneNumber(convertValue(crypto.priceUsd))}
               </td>
               <td
                 className={
