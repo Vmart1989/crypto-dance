@@ -18,8 +18,8 @@ export default function UserHeader() {
   if (!user) return null;
 
   return (
-    <div className="d-flex align-items-baseline">
-      <i className="bi bi-person-fill fs-5 me-2"></i>
+    <div className="d-flex align-items-baseline ">
+      <i className="bi bi-person-fill ms-3 fs-5 "></i>
       <span className="fs-6 me-4">{user.name || user.email}</span>
       <a
         onClick={handleLogout}

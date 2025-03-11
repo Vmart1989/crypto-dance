@@ -36,8 +36,8 @@ export default function DynamicMessage() {
 
     return (
       <div className="d-flex justify-content-between w-100 flex-wrap">
-        <div>
-          <h3>Fiat Balance</h3>
+        <div className="ms-2">
+          <h3 >Fiat Balance</h3>
           <h2>
             {symbol}
             {Number(fiatBalance * rate).toLocaleString(
@@ -46,7 +46,7 @@ export default function DynamicMessage() {
             )} 
           </h2>
         </div>
-        <div>
+        <div className="me-2">
           <CryptoBalance user={user} symbol={symbol} />
         </div>
       </div>
