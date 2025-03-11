@@ -15,6 +15,10 @@
 
 }
 
+.dark-bg {
+  background-color: #0e0118;
+}
+
 h1, h2 {
   font-family: 'Teko';
   font-weight: 500;

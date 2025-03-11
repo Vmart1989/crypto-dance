@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useCurrency } from "@/context/CurrencyContext";
 import { useConversionRate } from "@/hooks/useConversionRate";
 
-export default function CryptoBalance({ user, symbol }) {
+export default function CryptoBalance({ user, fiatSymbol }) {
   const { currency } = useCurrency();
   const { rate } = useConversionRate(currency);
   const [cryptoFiatTotal, setCryptoFiatTotal] = useState(0);
@@ -26,26 +26,47 @@ export default function CryptoBalance({ user, symbol }) {
     async function fetchCryptoValues() {
       if (user && user.cryptoAssets && user.cryptoAssets.length > 0) {
         try {
-          let totalFiat = 0;
-          let weightedChangeSum = 0;
-          // Fetch current data for each crypto asset in parallel
-          const assetData = await Promise.all(
+          const coinDataMap = {};
+          await Promise.all(
             user.cryptoAssets.map(async (asset) => {
-              const res = await fetch(
-                `https://api.coincap.io/v2/assets/${asset.symbol.toLowerCase()}`
-              );
-              const data = await res.json();
-              return data.data; // Contains priceUsd and changePercent24Hr, etc.
+              // Use coinId if available, else fallback to symbol
+              const endpoint = asset.coinId
+                ? asset.coinId.toLowerCase()
+                : asset.symbol.toLowerCase();
+
+              try {
+                const res = await fetch(
+                  `https://api.coincap.io/v2/assets/${endpoint}`
+                );
+                const json = await res.json();
+
+                // If json.data is missing or empty, mark null
+                if (!json.data) {
+                  console.error(`No data for ${endpoint}`);
+                  coinDataMap[asset.id] = null;
+                } else {
+                  coinDataMap[asset.id] = json.data;
+                }
+              } catch (err) {
+                console.error(`Error fetching data for ${endpoint}:`, err);
+                coinDataMap[asset.id] = null;
+              }
             })
           );
 
-          assetData.forEach((coinData, index) => {
-            const asset = user.cryptoAssets[index];
-            const currentPrice = Number(coinData.priceUsd);
-            const fiatValue = asset.balance * currentPrice;
-            totalFiat += fiatValue;
-            weightedChangeSum += fiatValue * Number(coinData.changePercent24Hr);
+          let totalFiat = 0;
+          let weightedChangeSum = 0;
+
+          user.cryptoAssets.forEach((asset) => {
+            const coinData = coinDataMap[asset.id];
+            if (coinData && coinData.priceUsd) {
+              const currentPrice = Number(coinData.priceUsd);
+              const fiatValue = asset.balance * currentPrice;
+              totalFiat += fiatValue;
+              weightedChangeSum += fiatValue * Number(coinData.changePercent24Hr);
+            }
           });
+
           const overallChange = totalFiat ? weightedChangeSum / totalFiat : 0;
           setCryptoFiatTotal(totalFiat);
           setCryptoWeightedChange(overallChange);
@@ -55,7 +76,6 @@ export default function CryptoBalance({ user, symbol }) {
           setCryptoWeightedChange(0);
         }
       } else {
-        // No crypto assets: default to 0
         setCryptoFiatTotal(0);
         setCryptoWeightedChange(0);
       }
@@ -67,7 +87,7 @@ export default function CryptoBalance({ user, symbol }) {
     <div>
       <h3>Crypto Balance</h3>
       <h2>
-        {symbol}
+        {fiatSymbol}
         {formatCurrency(convertValue(cryptoFiatTotal))}{" "}
         <span
           className={

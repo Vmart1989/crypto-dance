@@ -3,6 +3,7 @@
 import { Tab, Tabs } from "react-bootstrap";
 import TopCryptos from "@/components/TopCryptos";
 import SellAssets from "./SellAssets";
+import WalletTab from "./WalletTab";
 
 export default function DashboardTabs() {
   return (
@@ -24,7 +25,7 @@ export default function DashboardTabs() {
           <SellAssets />
         </Tab>
         <Tab eventKey="tbd" title="WALLET" className="border-start border-end border-bottom border-primary">
-          <p>Content for TBD tab.</p>
+        <WalletTab />
         </Tab>
       </Tabs>
     </div>

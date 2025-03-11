@@ -72,18 +72,18 @@ export default function RootLayout({ children }) {
                   </h1>
                 </a>
 
-                <ul className="nav nav-pills d-flex align-items-baseline">
+                <ul className="nav nav-pills d-flex align-items-baseline w-100 w-md-auto me-3 me-md-0 ">
                   <li className="nav-item">
                     <UserHeader />
                   </li>
 
-                  <li className="nav-item">
+                  <li className="nav-item ms-auto">
                     <CurrencyToggle />
                   </li>
                 </ul>
               </header>
               {/* Dynamic header text */}
-              <div className="d-flex justify-content-between align-items-center m-2">
+              <div className="d-flex justify-content-center justify-content-md-between align-items-center ">
                 <DynamicMessage />
               </div>
             </div>

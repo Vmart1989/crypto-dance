@@ -14,7 +14,7 @@ export function UserProvider({ children }) {
         const res = await fetch("/api/auth/me");
         if (res.ok) {
           const data = await res.json();
-          setUser(data.user);
+          setUser(data.user); // user includes transactions now
         } else {
           setUser(null);
         }

@@ -38,7 +38,7 @@ export default function CryptoTicker() {
   }, []);
 
   const convertValue = (value) => Number(value) * rate;
-  const symbol = currency === "USD" ? "$" : "€";
+  const fiatSymbol = currency === "USD" ? "$" : "€";
 
   // filter list based on the search query
   const filteredCryptos = useMemo(() => {
@@ -134,11 +134,12 @@ export default function CryptoTicker() {
                 {/* Conditionally render the buy icon only when on the dashboard */}
                 {pathname === "/dashboard" ? (
                   <BuyCoinModal
-                    coin={crypto}
-                    convertValue={convertValue}
-                    symbol={symbol}
-                    image={`https://assets.coincap.io/assets/icons/${crypto.symbol.toLowerCase()}@2x.png`}
-                  />
+                  coin={crypto}            
+                  convertValue={convertValue}
+                  symbol={fiatSymbol}   
+                  coinId={crypto.id}       
+                  image={`https://assets.coincap.io/assets/icons/${crypto.symbol.toLowerCase()}@2x.png`}
+                />
                 ) : (
                   crypto.rank
                 )}
@@ -161,11 +162,11 @@ export default function CryptoTicker() {
                 </Link>
               </td>
               <td className="d-none d-md-table-cell pb-2">
-                {symbol}
+                {fiatSymbol}
                 {formatLargeNumber(convertValue(crypto.marketCapUsd))}
               </td>
               <td className="pe-4 pb-2">
-                {symbol}
+                {fiatSymbol}
                 {formatSuboneNumber(convertValue(crypto.priceUsd))}
               </td>
               <td

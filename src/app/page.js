@@ -13,14 +13,14 @@ export default function Home() {
   return (
     <div>
       <main className="container mt-5 mb-5">
-        <div className="row justify-content-between">
-          <div className="p-0 col-12 col-md-8 border rounded border-primary-subtle h-100">
+        <div className="row justify-content-center ">
+          <div className="mx-auto p-0 col-11 col-md-8 border rounded border-primary-subtle h-100 mt-5 mt-md-0">
             <div>
               <TopCryptos />
             </div>
           </div>
-          <div className="h-50 col-12 col-md-3">
-            <div className="border rounded border-primary-subtle p-2">
+          <div className="mx-auto h-50 col-11 col-md-3 order-first order-md-last">
+            <div className="border rounded border-primary-subtle p-2 order-sm-1 ">
               {user ? (
                 // If the user is logged in, show a welcome message and a button to go to the dashboard
                 <>

@@ -5,7 +5,13 @@ import { useUser } from "@/context/UserContext";
 import { useCurrency } from "@/context/CurrencyContext";
 import { usePathname } from "next/navigation";
 
-export default function BuyCoinModal({ coin, convertValue, symbol }) {
+export default function BuyCoinModal({
+  coin,
+  convertValue,
+  fiatSymbol,
+  coinId,
+  image, // image URL passed from parent
+}) {
   const { user, setUser } = useUser();
   const pathname = usePathname();
   const [showModal, setShowModal] = useState(false);
@@ -27,7 +33,7 @@ export default function BuyCoinModal({ coin, convertValue, symbol }) {
       return;
     }
 
-    // Calculate total fiat cost based on the coin's current price (converted)
+    // Calculate total fiat cost based on coin's current price (converted)
     const fiatCost = amount * convertValue(coin.priceUsd);
     if (fiatCost > user.wallet.fiatBalance) {
       alert("Insufficient funds for this purchase.");
@@ -38,11 +44,12 @@ export default function BuyCoinModal({ coin, convertValue, symbol }) {
       const res = await fetch("/api/transactions/buy", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include", // <-- Ensure cookies are included
+        credentials: "include",
         body: JSON.stringify({
-          coinId: coin.id,
+          coinSymbol: coin.symbol, // use coin.symbol for ticker
+          coinId, // passed in prop (should be the correct coin id, e.g. "bitcoin")
           amount,
-          price: coin.priceUsd, // coin's price in USD
+          price: coin.priceUsd,
           fiatCost,
           fiatCurrency: currency,
         }),
@@ -53,7 +60,8 @@ export default function BuyCoinModal({ coin, convertValue, symbol }) {
       if (!res.ok) {
         alert(data.error || "Failed to complete purchase.");
       } else {
-        // Update the UserContext with the new wallet and crypto asset data
+        // Merge the updated data into the UserContext so that any component
+        // using UserContext.user refreshes automatically.
         setUser((prev) => ({
           ...prev,
           wallet: data.updatedWallet,
@@ -83,29 +91,28 @@ export default function BuyCoinModal({ coin, convertValue, symbol }) {
 
       {showModal && (
         <>
-          <div
-            className="modal show"
-            style={{ display: "block" }}
-            tabIndex="-1"
-          >
+          <div className="modal show" style={{ display: "block" }} tabIndex="-1">
             <div className="modal-dialog">
               <div className="modal-content bg-dark text-light">
                 <div className="modal-header">
                   <div className="d-flex align-items-center">
+                    {/* Use the image prop passed from parent */}
                     <img
-                      src={`https://assets.coincap.io/assets/icons/${coin.symbol.toLowerCase()}@2x.png`}
+                      src={image}
                       alt={coin.name}
                       style={{
                         width: "40px",
                         height: "40px",
                         marginRight: "0.5rem",
                       }}
+                      onError={(e) => {
+                        e.target.style.display = "none";
+                      }}
                     />
                     <h5 className="modal-title">
                       Buy {coin.name} ({coin.symbol})
                     </h5>
                   </div>
-
                   <button
                     type="button"
                     className="btn-close btn-close-white"
@@ -115,17 +122,20 @@ export default function BuyCoinModal({ coin, convertValue, symbol }) {
                 </div>
                 <div className="modal-body">
                   <p>
-                    <strong>Your Fiat Balance: </strong> {symbol}
+                    <strong>Your Fiat Balance: </strong>
+                    {fiatSymbol}
                     {user.wallet.fiatBalance.toLocaleString(undefined, {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
                     })}
                   </p>
                   <p>
-                    <strong>1 {coin.symbol} = </strong> {symbol}
+                    <strong>1 {coin.symbol} = </strong>
+                    {fiatSymbol}
                     {convertValue(coin.priceUsd).toLocaleString(undefined, {
                       minimumFractionDigits: 2,
-                      maximumFractionDigits: coin.priceUsd < 0.099 ? 7 : 2,
+                      maximumFractionDigits:
+                        coin.priceUsd < 0.099 ? 7 : 2,
                     })}
                   </p>
                   <div className="mb-3">
@@ -142,7 +152,7 @@ export default function BuyCoinModal({ coin, convertValue, symbol }) {
                     />
                   </div>
                   <p>
-                    <strong>Total Cost:</strong> {symbol}{" "}
+                    <strong>Total Cost:</strong> {fiatSymbol}{" "}
                     {(
                       convertValue(coin.priceUsd) * parseFloat(buyAmount || 0)
                     ).toLocaleString(undefined, {
@@ -175,7 +185,6 @@ export default function BuyCoinModal({ coin, convertValue, symbol }) {
               </div>
             </div>
           </div>
-          {/* Modal backdrop */}
           <div className="modal-backdrop fade show"></div>
         </>
       )}

@@ -2,12 +2,10 @@
 
 import { useState } from "react";
 import { useUser } from "@/context/UserContext";
-import { useCurrency } from "@/context/CurrencyContext";
 
 export default function SellCoinModal({ asset, currency }) {
   const { user, setUser } = useUser();
-  const { currency: curr } = useCurrency(); // this should match the passed currency; use if needed
-  const symbol = currency === "USD" ? "$" : "€";
+  const fiatSymbol = currency === "USD" ? "$" : "€";
   const [showModal, setShowModal] = useState(false);
   const [sellAmount, setSellAmount] = useState("");
   const [feedback, setFeedback] = useState("");
@@ -31,24 +29,29 @@ export default function SellCoinModal({ asset, currency }) {
     }
     // Calculate revenue: amount * current price in USD
     const fiatRevenue = amount * asset.currentPriceUsd;
+
+    // Fallback: if asset.coinId is null, use asset.symbol for coinId
+    const safeCoinId = asset.coinId || asset.symbol;
+
     try {
       const res = await fetch("/api/transactions/sell", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
-          coinId: asset.symbol, // use id for selling
+          coinSymbol: asset.symbol,     // short ticker
+          coinId: safeCoinId,          // fallback to symbol if coinId is null
           amount,
           price: asset.currentPriceUsd,
           fiatRevenue,
-          fiatCurrency: currency, // send the current fiat currency
+          fiatCurrency: currency,
         }),
       });
       const data = await res.json();
       if (!res.ok) {
         alert(data.error || "Failed to complete sale.");
       } else {
-        // Update UserContext with the updated wallet and crypto assets
+        // Merge updated wallet and crypto assets into the user context
         setUser((prev) => ({
           ...prev,
           wallet: data.updatedWallet,
@@ -66,7 +69,6 @@ export default function SellCoinModal({ asset, currency }) {
 
   return (
     <>
-      {/* Sell icon */}
       <span
         onClick={handleOpen}
         style={{ cursor: "pointer" }}
@@ -77,25 +79,28 @@ export default function SellCoinModal({ asset, currency }) {
 
       {showModal && (
         <>
-          <div
-            className="modal show"
-            style={{ display: "block" }}
-            tabIndex="-1"
-          >
+          <div className="modal show" style={{ display: "block" }} tabIndex="-1">
             <div className="modal-dialog">
               <div className="modal-content bg-dark text-light">
                 <div className="modal-header">
                   <div className="d-flex align-items-center">
                     <img
-                      src={`https://assets.coincap.io/assets/icons/${asset.assetSymbol.toLowerCase()}@2x.png`}
-                      alt={asset.symbol}
+                      src={`https://assets.coincap.io/assets/icons/${
+                        (asset.assetSymbol || asset.symbol).toLowerCase()
+                      }@2x.png`}
+                      alt={asset.assetName || asset.symbol}
                       style={{
-                        width: "40px",
-                        height: "40px",
+                        width: "30px",
+                        height: "30px",
                         marginRight: "0.5rem",
                       }}
+                      onError={(e) => {
+                        e.target.style.display = "none";
+                      }}
                     />
-                    <h5 className="modal-title">Sell {asset.assetName}</h5>
+                    <h5 className="modal-title">
+                      Sell {asset.assetName || asset.symbol}
+                    </h5>
                   </div>
                   <button
                     type="button"
@@ -106,11 +111,11 @@ export default function SellCoinModal({ asset, currency }) {
                 </div>
                 <div className="modal-body">
                   <p>
-                    <strong>Your {asset.assetName} Balance:</strong>{" "}
+                    <strong>Your {asset.assetName || asset.symbol} Balance:</strong>{" "}
                     {asset.balance}
                   </p>
                   <p>
-                    <strong>1 {asset.assetSymbol} = </strong> {symbol}
+                    <strong>1 {asset.symbol} = </strong> {fiatSymbol}
                     {Number(asset.currentPriceUsd).toLocaleString(undefined, {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
@@ -120,15 +125,24 @@ export default function SellCoinModal({ asset, currency }) {
                     <label htmlFor="sellAmount" className="form-label">
                       Amount to Sell
                     </label>
-                    <input
-                      type="number"
-                      className="form-control"
-                      id="sellAmount"
-                      value={sellAmount}
-                      onChange={(e) => setSellAmount(e.target.value)}
-                      min="0"
-                      max={asset.balance}
-                    />
+                    <div className="input-group">
+                      <input
+                        type="number"
+                        className="form-control"
+                        id="sellAmount"
+                        value={sellAmount}
+                        onChange={(e) => setSellAmount(e.target.value)}
+                        min="0"
+                        max={asset.balance}
+                      />
+                      <button
+                        type="button"
+                        className="btn btn-secondary border border-light"
+                        onClick={() => setSellAmount(String(asset.balance))}
+                      >
+                        Max
+                      </button>
+                    </div>
                   </div>
                   <p>
                     <strong>Total Revenue:</strong>{" "}

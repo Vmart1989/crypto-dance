@@ -71,7 +71,7 @@ export default function RegisterForm() {
           <input
             className="w-100 text-center"
             type="password"
-            placeholder="Password"
+            placeholder="Password (min. 8 characteres)"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required

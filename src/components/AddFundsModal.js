@@ -37,6 +37,7 @@ export default function AddFundsModal() {
         setUser((prev) => ({ ...prev, wallet: data.wallet }));
         setFeedback("Funds added successfully!");
         setTimeout(() => setFeedback(""), 5000);
+        
         handleClose();
       }
     } catch (error) {

@@ -17,10 +17,13 @@ export async function GET(request) {
       token.value,
       new TextEncoder().encode(JWT_SECRET)
     );
-    // Include the wallet in the query so that user.wallet is populated
     const user = await prisma.user.findUnique({
       where: { id: payload.userId },
-      include: { wallet: true, cryptoAssets: true },
+      include: {
+        wallet: true,
+        cryptoAssets: true,
+        transactions: true, // Include transactions here
+      },
     });
     if (!user) {
       return NextResponse.json({ user: null }, { status: 401 });
@@ -30,8 +33,9 @@ export async function GET(request) {
         id: user.id,
         email: user.email,
         name: user.name,
-        wallet: user.wallet, // Ensure wallet is returned (should have fiatBalance)
+        wallet: user.wallet,
         cryptoAssets: user.cryptoAssets,
+        transactions: user.transactions, // Return transactions to the client
       },
     });
   } catch (error) {

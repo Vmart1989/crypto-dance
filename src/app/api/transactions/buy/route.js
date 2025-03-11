@@ -1,5 +1,4 @@
-// app/api/transactions/buy/route.js
-export const runtime = "nodejs"; // Ensure Node.js runtime
+export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
 import { jwtVerify } from "jose";
@@ -9,108 +8,95 @@ const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET;
 
 export async function POST(request) {
-  // Retrieve token from cookies
-  const token = request.cookies.get("token");
-  if (!token) {
+  const tokenObj = request.cookies.get("token");
+  if (!tokenObj || !tokenObj.value) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
-    // Verify token and extract payload
     const { payload } = await jwtVerify(
-      token.value,
+      tokenObj.value,
       new TextEncoder().encode(JWT_SECRET)
     );
-
     const userId = payload.userId;
 
-    // Parse request body
-    const { coinId, amount, price, fiatCost, fiatCurrency } = await request.json();
+    // We expect the request body to include coinId, coinSymbol, etc.
+    const { coinId, coinSymbol, amount, price, fiatCost, fiatCurrency } =
+      await request.json();
 
-    // Validate the request data
-    if (!coinId || !amount || !price || !fiatCost || !fiatCurrency) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      );
+    if (!coinId || !coinSymbol || !amount || !price || !fiatCost || !fiatCurrency) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    // Retrieve the user's wallet
-    const wallet = await prisma.wallet.findUnique({
-      where: { userId },
-    });
+    const wallet = await prisma.wallet.findUnique({ where: { userId } });
     if (!wallet) {
       return NextResponse.json({ error: "Wallet not found" }, { status: 404 });
     }
 
-    // Check if the user has enough fiat funds
     if (wallet.fiatBalance < fiatCost) {
-      return NextResponse.json(
-        { error: "Insufficient fiat funds" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Insufficient fiat funds" }, { status: 400 });
     }
 
-    // Deduct fiat cost from the wallet
+    // Deduct from wallet
     const updatedWallet = await prisma.wallet.update({
       where: { userId },
       data: { fiatBalance: wallet.fiatBalance - fiatCost },
     });
 
-    // Create a transaction record for the purchase
+    // Create transaction
     const transaction = await prisma.transaction.create({
       data: {
         type: "buy",
-        cryptoSymbol: coinId,
-        amount: amount,
-        price: Number(price), // Convert price to a number
-        fiatAmount: fiatCost,
+        cryptoSymbol: coinSymbol, // e.g. "BTC"
+        coinId: coinId,           // e.g. "bitcoin"
+        amount: Number(amount),
+        price: Number(price),
+        fiatAmount: Number(fiatCost),
         fiatCurrency,
         user: { connect: { id: userId } },
       },
     });
 
-    // Update or create the user's crypto asset for this coin
+    // Update or create CryptoAsset
+    // We'll match existing assets by BOTH coinId AND symbol
+    // If you only want to match by coinId, do coinId: coinId
     let updatedCryptoAsset;
     const existingAsset = await prisma.cryptoAsset.findFirst({
       where: {
         userId,
-        symbol: coinId, // Adjust if coinId differs from symbol.
+        coinId: coinId,   // or symbol: coinSymbol, if you prefer
       },
     });
 
     if (existingAsset) {
       updatedCryptoAsset = await prisma.cryptoAsset.update({
         where: { id: existingAsset.id },
-        data: { balance: existingAsset.balance + amount },
+        data: {
+          balance: existingAsset.balance + Number(amount),
+        },
       });
     } else {
       updatedCryptoAsset = await prisma.cryptoAsset.create({
         data: {
-          symbol: coinId, // Adjust if necessary.
-          balance: amount,
+          symbol: coinSymbol,   // e.g. "BTC"
+          coinId: coinId,       // e.g. "bitcoin"
+          balance: Number(amount),
           user: { connect: { id: userId } },
         },
       });
     }
 
-    // Optionally, fetch all crypto assets for the user if needed:
     const updatedCryptoAssets = await prisma.cryptoAsset.findMany({
       where: { userId },
     });
 
-    // Return the updated wallet and crypto asset data
     return NextResponse.json({
       message: "Purchase successful",
       updatedWallet,
       updatedCryptoAssets,
     });
   } catch (error) {
-    console.log(error.stack);
     console.error("Error processing purchase:", error);
-    return NextResponse.json(
-      { error: "Failed to process purchase" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to process purchase" }, { status: 500 });
   }
 }
