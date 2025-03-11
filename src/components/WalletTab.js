@@ -106,9 +106,12 @@ export default function WalletTab() {
     });
   };
 
+ 
+
   return (
     <div className={styles.tickerContainer}>
       <h2>Crypto Assets</h2>
+      
       <div className="d-flex flex-wrap gap-3 ">
         {assetData.length === 0 ? (
           <p>You do not own any crypto assets.</p>

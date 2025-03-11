@@ -40,12 +40,12 @@ export default function RegisterForm() {
   };
 
   return (
-    <div className="row justify-content-center w-100">
-    <div className="col-md-3 border border-primary rounded m-5 p-3">
+    <div className="row justify-content-center">
+    <div className="col-10 order-2 col-md-3 border border-primary rounded m-5 p-3">
       <h3>Already have an account?</h3>
     <LoginForm />
     </div>
-    <div className="col-9 col-md-6 border border-primary rounded p-3 my-5 text-center">
+    <div className="col-10 col-md-6 border border-primary rounded p-3 my-5 text-center">
       <h3>Register Now For Full Access</h3>
       <form onSubmit={handleRegister}>
         <div className="mb-3">
