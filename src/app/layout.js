@@ -72,7 +72,7 @@ export default function RootLayout({ children }) {
                   </h1>
                 </a>
 
-                <ul className="nav nav-pills d-flex align-items-baseline w-100 w-md-auto me-3 me-md-0 ">
+                <ul className="nav nav-pills d-flex align-items-baseline w-100-movil me-3 me-md-0 ">
                   <li className="nav-item">
                     <UserHeader />
                   </li>

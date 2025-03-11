@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/context/UserContext";
+import LoginForm from "@/components/LoginForm";
 
 export default function RegisterForm() {
   const [email, setEmail] = useState("");
@@ -39,9 +40,11 @@ export default function RegisterForm() {
   };
 
   return (
-    <div className="row justify-content-center">
-    
-    
+    <div className="row justify-content-center w-100">
+    <div className="col-md-3 border border-primary rounded m-5 p-3">
+      <h3>Already have an account?</h3>
+    <LoginForm />
+    </div>
     <div className="col-9 col-md-6 border border-primary rounded p-3 my-5 text-center">
       <h3>Register Now For Full Access</h3>
       <form onSubmit={handleRegister}>

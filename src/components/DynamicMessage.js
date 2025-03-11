@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useConversionRate } from "@/hooks/useConversionRate";
 import Link from "next/link";
 import CryptoBalance from "./CryptoBalance";
+import AddFundsModal from "./AddFundsModal";
 
 export default function DynamicMessage() {
   const { user } = useUser();
@@ -42,7 +43,7 @@ export default function DynamicMessage() {
             {Number(fiatBalance * rate).toLocaleString(
               currency === "USD" ? "en-US" : "de-DE",
               { minimumFractionDigits: 2, maximumFractionDigits: 2 }
-            )}
+            )} 
           </h2>
         </div>
         <div>

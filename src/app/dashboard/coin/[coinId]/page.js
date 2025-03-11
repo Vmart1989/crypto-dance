@@ -22,12 +22,10 @@ export default function CoinDetails() {
     async function fetchCoinData() {
       try {
         // Fetch coin details
-        const resCoin = await fetch(
-          `https://api.coincap.io/v2/assets/${coinId}`
-        );
+        const resCoin = await fetch(`https://api.coincap.io/v2/assets/${coinId}`);
         const coinJson = await resCoin.json();
 
-        // Fetch daily history for the past 7 days (default endpoint might return more data)
+        // Fetch daily history for the past 7 days
         const resHistory = await fetch(
           `https://api.coincap.io/v2/assets/${coinId}/history?interval=d1`
         );
@@ -58,9 +56,7 @@ export default function CoinDetails() {
         );
         const yearJson = await resYear.json();
         if (yearJson.data && yearJson.data.length > 0) {
-          const maxPrice = Math.max(
-            ...yearJson.data.map((point) => Number(point.priceUsd))
-          );
+          const maxPrice = Math.max(...yearJson.data.map((point) => Number(point.priceUsd)));
           setYearlyHigh(maxPrice);
         }
       } catch (err) {
@@ -109,9 +105,7 @@ export default function CoinDetails() {
             {formatPrice(convertValue(coin.priceUsd))}{" "}
             <span
               className={
-                Number(coin.changePercent24Hr) >= 0
-                  ? "text-info"
-                  : "text-danger"
+                Number(coin.changePercent24Hr) >= 0 ? "text-info" : "text-danger"
               }
             >
               ({Number(coin.changePercent24Hr).toFixed(2)}%)
@@ -122,10 +116,12 @@ export default function CoinDetails() {
             ></i>
           </h4>
         </div>
+        {/* Pass coinId from the fetched coin data */}
         <BuyCoinModal
           coin={coin}
           convertValue={convertValue}
           symbol={symbol}
+          coinId={coin.id} 
           image={`https://assets.coincap.io/assets/icons/${coin.symbol.toLowerCase()}@2x.png`}
         />
       </div>
@@ -188,7 +184,6 @@ export default function CoinDetails() {
           )}
         </div>
       </div>
-      {/* Render the chart component */}
       <PriceHistoryChart
         coinId={coinId}
         convertValue={convertValue}
