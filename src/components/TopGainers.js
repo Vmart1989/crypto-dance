@@ -13,7 +13,8 @@ export default function TopGainers() {
       try {
         const res = await fetch("/api/cryptos");
         const json = await res.json();
-        const data = json.data;
+        // Ensure data is an array before filtering
+        const data = Array.isArray(json.data) ? json.data : [];
 
         // Filter out cryptos with a positive 24h percentage gain
         const positiveGainers = data.filter(
@@ -37,54 +38,57 @@ export default function TopGainers() {
     }
 
     fetchCryptos();
-
-    
   }, []);
 
   return (
     <div className={styles.topGainersContainer}>
-      
       {loading ? (
         <div className="spinner-border text-primary" role="status">
           <span className="visually-hidden">Loading...</span>
         </div>
       ) : (
         <table className="table table-borderless">
-          <thead >
+          <thead>
             <tr>
-              
               <th></th>
               <th className="text-light">24h Change</th>
             </tr>
           </thead>
-          <tbody >
-            {topGainers.map((crypto) => (
-              <tr  key={crypto.id}>
-                
-                <td className="text-light">
-                  <img
-                    src={`https://assets.coincap.io/assets/icons/${crypto.symbol.toLowerCase()}@2x.png`}
-                    alt={crypto.name}
-                    width="24"
-                    height="24"
-                    onError={(e) => {
-                      e.target.style.display = "none";
-                    }}
-                    style={{ marginRight: "0.5rem" }}
-                  />
-                  {crypto.name}
-                </td>
-                <td
-                  className={
-                    Number(crypto.changePercent24Hr) > 0
-                      ? "text-info"
-                      : "text-danger"
-                  }
-                >
-                  {Number(crypto.changePercent24Hr).toFixed(2)}%
+          <tbody>
+            {topGainers.length === 0 ? (
+              <tr>
+                <td colSpan="2" className="text-light">
+                  Market looks disappointing today...
                 </td>
               </tr>
-            ))}
+            ) : (
+              topGainers.map((crypto) => (
+                <tr key={crypto.id}>
+                  <td className="text-light">
+                    <img
+                      src={`https://assets.coincap.io/assets/icons/${crypto.symbol.toLowerCase()}@2x.png`}
+                      alt={crypto.name}
+                      width="24"
+                      height="24"
+                      onError={(e) => {
+                        e.target.style.display = "none";
+                      }}
+                      style={{ marginRight: "0.5rem" }}
+                    />
+                    {crypto.name}
+                  </td>
+                  <td
+                    className={
+                      Number(crypto.changePercent24Hr) > 0
+                        ? "text-info"
+                        : "text-danger"
+                    }
+                  >
+                    {Number(crypto.changePercent24Hr).toFixed(2)}%
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       )}

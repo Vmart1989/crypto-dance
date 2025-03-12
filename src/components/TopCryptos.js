@@ -2,8 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react";
 import styles from "./TopCryptos.module.css";
-import { formatLargeNumber } from "../utils/formatNumbers";
-import { formatSuboneNumber } from "../utils/formatNumbers";
+import { formatLargeNumber, formatSuboneNumber } from "../utils/formatNumbers";
 import { useConversionRate } from "../hooks/useConversionRate";
 import { useCurrency } from "../context/CurrencyContext";
 import { sortCryptos } from "../utils/sortCryptos";
@@ -13,8 +12,9 @@ import { usePathname } from "next/navigation";
 
 export default function CryptoTicker() {
   const [cryptos, setCryptos] = useState([]);
+  const [cryptosLoading, setCryptosLoading] = useState(true);
   const { currency } = useCurrency();
-  const { rate, loading } = useConversionRate(currency);
+  const { rate, loading: conversionLoading } = useConversionRate(currency);
   const [search, setSearch] = useState("");
   const [sortConfig, setSortConfig] = useState({
     key: "rank",
@@ -30,6 +30,8 @@ export default function CryptoTicker() {
         setCryptos(json.data);
       } catch (error) {
         console.error("Error fetching crypto data:", error);
+      } finally {
+        setCryptosLoading(false);
       }
     }
     fetchCryptos();
@@ -60,7 +62,6 @@ export default function CryptoTicker() {
   const displayCryptos = search.trim() !== "" ? filteredCryptos : sortedCryptos;
 
   const handleSort = (key) => {
-    // Only allow sorting when there's no search query
     if (search.trim() !== "") return;
     if (sortConfig.key === key) {
       setSortConfig({
@@ -76,6 +77,10 @@ export default function CryptoTicker() {
     if (sortConfig.key !== key || search.trim() !== "") return null;
     return sortConfig.direction === "asc" ? " ▲" : " ▼";
   };
+
+  // Define combined loading: we show spinner if cryptos are still loading
+  // (conversion rate loading is less important if cryptos are already loaded)
+  const isLoading = cryptosLoading;
 
   return (
     <div className={styles.tickerContainer}>
@@ -95,7 +100,7 @@ export default function CryptoTicker() {
         </div>
       </div>
 
-      {loading && (
+      {isLoading && (
         <div className="spinner-border text-light" role="status">
           <span className="visually-hidden">Loading...</span>
         </div>
@@ -104,10 +109,10 @@ export default function CryptoTicker() {
       <table className="w-100">
         <thead className="sticky-top">
           <tr>
-            <th className="p-1 pb-3"></th>
+            <th className="p-1 pb-3 "></th>
             <th className="p-1 pb-3 "></th>
             <th
-              className="d-none d-md-table-cell p-1 pb-3"
+              className="d-none d-md-table-cell p-1 pb-3 bg-for-th"
               onClick={() => handleSort("marketCapUsd")}
               style={{
                 cursor: search.trim() === "" ? "pointer" : "not-allowed",
@@ -116,7 +121,7 @@ export default function CryptoTicker() {
               Market Cap{renderSortArrow("marketCapUsd")}
             </th>
             <th
-              className="p-1 pb-3"
+              className="p-1 pb-3 bg-for-th"
               onClick={() => handleSort("priceUsd")}
               style={{
                 cursor: search.trim() === "" ? "pointer" : "not-allowed",
@@ -124,7 +129,7 @@ export default function CryptoTicker() {
             >
               Price{renderSortArrow("priceUsd")}
             </th>
-            <th className="p-1 pb-3 ">24h Change</th>
+            <th className="p-1 pb-3 bg-for-th">24h Change</th>
           </tr>
         </thead>
         <tbody>
@@ -134,12 +139,12 @@ export default function CryptoTicker() {
                 {/* Conditionally render the buy icon only when on the dashboard */}
                 {pathname === "/dashboard" ? (
                   <BuyCoinModal
-                  coin={crypto}            
-                  convertValue={convertValue}
-                  symbol={fiatSymbol}   
-                  coinId={crypto.id}       
-                  image={`https://assets.coincap.io/assets/icons/${crypto.symbol.toLowerCase()}@2x.png`}
-                />
+                    coin={crypto}
+                    convertValue={convertValue}
+                    symbol={fiatSymbol}
+                    coinId={crypto.id}
+                    image={`https://assets.coincap.io/assets/icons/${crypto.symbol.toLowerCase()}@2x.png`}
+                  />
                 ) : (
                   crypto.rank
                 )}

@@ -5,6 +5,7 @@ import styles from "./TopCryptos.module.css";
 import { useUser } from "@/context/UserContext";
 import { useCurrency } from "@/context/CurrencyContext";
 import { useConversionRate } from "@/hooks/useConversionRate";
+import Link from "next/link";
 
 function computeCoinStats(transactions) {
   const stats = {};
@@ -75,6 +76,7 @@ export default function WalletTab() {
               symbol: asset.symbol,
               balance: asset.balance,
               name: json.data.name,
+              coinId: asset.coinId,
               priceUsd: Number(json.data.priceUsd),
               change24h: Number(json.data.changePercent24Hr),
             };
@@ -106,12 +108,10 @@ export default function WalletTab() {
     });
   };
 
- 
-
   return (
     <div className={styles.tickerContainer}>
       <h2>Crypto Assets</h2>
-      
+
       <div className="d-flex flex-wrap gap-3 ">
         {assetData.length === 0 ? (
           <p>You do not own any crypto assets.</p>
@@ -149,13 +149,24 @@ export default function WalletTab() {
                       e.target.style.display = "none";
                     }}
                   />
-                  <h5 className="m-0 ">
-                    {coin.name} ({coin.symbol})
-                  </h5>
+                  <Link
+                    className="text-decoration-none link-light"
+                    href={`/dashboard/coin/${coin.coinId}`}
+                  >
+                    <h5 className="m-0 ">
+                      {coin.name} ({coin.symbol})
+                    </h5>
+                  </Link>
                 </div>
+                <p>Balance: {coin.balance.toFixed(2)} </p>
                 <p>
-                  Balance: {coin.balance.toFixed(2)}{" "}
-                  <span className={coin.change24h >= 0 ? "text-info" : "text-danger"}>
+                  Value: {fiatSymbol}
+                  {currentValueUsd.toFixed(2)}{" "}
+                  <span
+                    className={
+                      coin.change24h >= 0 ? "text-info" : "text-danger"
+                    }
+                  >
                     ({coin.change24h.toFixed(2)}% / 24h)
                   </span>
                 </p>
@@ -165,16 +176,22 @@ export default function WalletTab() {
                 </p>
                 <p>
                   Average Cost: {fiatSymbol}
-                  {formatFiat(stats.averageCost * rate)}
+                  {stats.averageCost * rate > 0.009
+                    ? formatFiat((stats.averageCost * rate).toFixed(2))
+                    : formatFiat((stats.averageCost * rate).toFixed(7))}
                 </p>
-                <p>
-                  Portfolio Diversity: {diversityPct}%
-                </p>
+                <p>Portfolio Diversity: {diversityPct}%</p>
                 <p>
                   Unrealized P/L:{" "}
-                  <span className={unrealized >= 0 ? "text-info" : "text-danger"}>
+                  <span
+                    className={unrealized >= 0 ? "text-info" : "text-danger"}
+                  >
                     {fiatSymbol}
-                    {formatFiat(unrealized)}
+                    {unrealized === 0
+                      ? "0"
+                      : unrealized > -0.09
+                      ? formatFiat(unrealized.toFixed(2))
+                      : formatFiat(unrealized.toFixed(4))}
                   </span>
                 </p>
               </div>

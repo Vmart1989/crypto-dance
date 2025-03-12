@@ -2,6 +2,7 @@
 
 import { useUser } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function UserHeader() {
   const { user, setUser } = useUser();
@@ -30,12 +31,13 @@ export default function UserHeader() {
         Log out
       </a>
       <a
-        
         style={{ cursor: "pointer" }}
         className="fs-6 link-offset-2 me-4 link-offset-3-hover link-underline-primary link-underline-opacity-0 link-underline-opacity-75-hover"
       >
-        <i className="bi bi-chat-dots fs-5 me-2"></i>
-        AI bot
+        <i className="bi bi-newspaper fs-5 me-2"></i>
+        <Link href="/dashboard/news">
+  News
+</Link>
       </a>
     </div>
   );

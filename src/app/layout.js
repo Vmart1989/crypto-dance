@@ -9,8 +9,6 @@ import { UserProvider } from "../context/UserContext";
 import DynamicMessage from "@/components/DynamicMessage";
 import UserHeader from "@/components/UserHeader";
 
-
-
 const teko = Teko({
   subsets: ["latin"],
   weight: ["400", "700"], // Adjust weights as needed
@@ -93,33 +91,52 @@ export default function RootLayout({ children }) {
             {/* FOOTER  */}
             <div className="container ">
               <footer className="py-3 my-4">
-                <ul className="nav justify-content-start border-bottom border-primary-subtle pb-3 mb-3">
-                  <li className="nav-item">
-                    <a href="#" className="nav-link px-2 text-body-secondary">
-                      Home
-                    </a>
-                  </li>
-                  <li className="nav-item">
-                    <a href="#" className="nav-link px-2 text-body-secondary">
-                      Features
-                    </a>
-                  </li>
-                  <li className="nav-item">
-                    <a href="#" className="nav-link px-2 text-body-secondary">
-                      Pricing
-                    </a>
-                  </li>
-                  <li className="nav-item">
-                    <a href="#" className="nav-link px-2 text-body-secondary">
-                      FAQs
-                    </a>
-                  </li>
-                  <li className="nav-item">
-                    <a href="#" className="nav-link px-2 text-body-secondary">
-                      About
-                    </a>
-                  </li>
-                </ul>
+                <div className="d-flex justify-content-between align-baseline ">
+                  <div>
+                    <ul className="nav justify-content-start  pb-3 mb-3">
+                      <li className="nav-item">
+                        <a
+                          href="#"
+                          className="nav-link px-2 text-body-secondary"
+                        >
+                          Home
+                        </a>
+                      </li>
+                      <li className="nav-item">
+                        <a
+                          href="#"
+                          className="nav-link px-2 text-body-secondary"
+                        >
+                          Features
+                        </a>
+                      </li>
+
+                      <li className="nav-item">
+                        <a
+                          href="#"
+                          className="nav-link px-2 text-body-secondary"
+                        >
+                          FAQs
+                        </a>
+                      </li>
+                      <li className="nav-item">
+                        <a
+                          href="#"
+                          className="nav-link px-2 text-body-secondary"
+                        >
+                          About
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <p className="px-2 text-body-secondary">
+                      Data provided by{" "}
+                      <a href="https://www.coincap.io/">Coincap.io</a>
+                    </p>
+                  </div>
+                </div>
                 <p className="text-start text-secondary">
                   © {new Date().getFullYear()} vmart.dev
                 </p>
@@ -127,7 +144,6 @@ export default function RootLayout({ children }) {
             </div>
           </UserProvider>
         </CurrencyProvider>
-
       </body>
     </html>
   );
