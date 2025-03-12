@@ -22,8 +22,10 @@
 .bg-for-th {
   background-color: #040111; 
   
+}
 
-  
+.links {
+  text-decoration: none;
 }
 
 .w-100-movil {

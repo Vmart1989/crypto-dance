@@ -7,7 +7,6 @@ export default function CryptoNewsPage() {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
- 
 
   useEffect(() => {
     async function fetchNews() {
@@ -38,17 +37,15 @@ export default function CryptoNewsPage() {
 
   return (
     <div className="container mt-5">
-        <div className="d-flex justify-content-between">
-      <h2>Today's Crypto News</h2>
-      <a
-        style={{ cursor: "pointer" }}
-        className="fs-6 link-offset-2 me-4 link-offset-3-hover  link-underline-opacity-0 link-underline-opacity-75-hover"
-      >
-        <i className="bi bi-arrow-left fs-5 me-2"></i>
-        <Link href="/dashboard">
-  Back to dashboard
-</Link>
-      </a>
+      <div className="d-flex justify-content-between">
+        <h2>Today's Crypto News</h2>
+        <a
+          style={{ cursor: "pointer" }}
+          className="fs-6 link-offset-2 me-4 link-offset-3-hover  link-underline-opacity-0 link-underline-opacity-75-hover"
+        >
+          <i className="bi bi-arrow-left fs-5 me-2"></i>
+          <Link href="/dashboard">Back to dashboard</Link>
+        </a>
       </div>
       {loading && (
         <div className="spinner-border text-primary" role="status">
@@ -71,7 +68,7 @@ export default function CryptoNewsPage() {
                     src={article.image_url}
                     alt={article.title || "News Image"}
                     className="card-img-top mb-2"
-                    style={{ objectFit: "cover", maxHeight: "300px"}}
+                    style={{ objectFit: "cover", maxHeight: "300px" }}
                     onError={(e) => {
                       e.target.style.display = "none";
                     }}
@@ -84,9 +81,9 @@ export default function CryptoNewsPage() {
                     {new Date(article.pubDate).toLocaleString()}
                   </p>
                 )}
-
+                <div className="d-flex justify-content-between align-items-center">
                 {article.source_name && (
-                  <div className="d-flex align-items-center mb-2">
+                  <div className="d-flex align-items-center">
                     {article.source_icon && (
                       <img
                         src={article.source_icon}
@@ -115,7 +112,9 @@ export default function CryptoNewsPage() {
                   >
                     See full article
                   </a>
+                  
                 )}
+                </div>
               </div>
             </div>
           </div>

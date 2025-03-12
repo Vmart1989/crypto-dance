@@ -30,15 +30,13 @@ export default function UserHeader() {
         <i className="bi bi-box-arrow-right fs-5 me-2"></i>
         Log out
       </a>
-      <a
-        style={{ cursor: "pointer" }}
+
+      <Link
         className="fs-6 link-offset-2 me-4 link-offset-3-hover link-underline-primary link-underline-opacity-0 link-underline-opacity-75-hover"
+        href="/dashboard/news"
       >
-        <i className="bi bi-newspaper fs-5 me-2"></i>
-        <Link href="/dashboard/news">
-  News
-</Link>
-      </a>
+        <i className="bi bi-newspaper fs-5 me-2 link-primary "></i>News
+      </Link>
     </div>
   );
 }

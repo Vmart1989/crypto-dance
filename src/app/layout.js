@@ -8,6 +8,7 @@ import CurrencyToggle from "../components/CurrencyToggle";
 import { UserProvider } from "../context/UserContext";
 import DynamicMessage from "@/components/DynamicMessage";
 import UserHeader from "@/components/UserHeader";
+import Link from "next/link";
 
 const teko = Teko({
   subsets: ["latin"],
@@ -95,12 +96,12 @@ export default function RootLayout({ children }) {
                   <div>
                     <ul className="nav justify-content-start  pb-3 mb-3">
                       <li className="nav-item">
-                        <a
-                          href="#"
-                          className="nav-link px-2 text-body-secondary"
+                        <Link
+                          className="nav-link px-2 text-body-secondary link-underline-opacity-0"
+                          href="/"
                         >
                           Home
-                        </a>
+                        </Link>
                       </li>
                       <li className="nav-item">
                         <a
@@ -132,7 +133,7 @@ export default function RootLayout({ children }) {
 
                   <div>
                     <p className="px-2 text-body-secondary">
-                      Data provided by{" "}
+                      Market data provided by{" "}
                       <a href="https://www.coincap.io/">Coincap.io</a>
                     </p>
                   </div>

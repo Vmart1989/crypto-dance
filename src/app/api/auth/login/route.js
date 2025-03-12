@@ -1,3 +1,4 @@
+// app/api/auth/login/route.js
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { PrismaClient } from "@prisma/client";
@@ -19,16 +20,19 @@ export async function POST(request) {
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }
 
-    // Generate a JWT using jose
-    const token = await new SignJWT({ userId: user.id, email: user.email })
+    // Generate a JWT using jose, including the role in the payload.
+    const token = await new SignJWT({
+      userId: user.id,
+      email: user.email,
+      role: user.role, // Include role here
+    })
       .setProtectedHeader({ alg: "HS256" })
       .setExpirationTime("1h")
       .sign(new TextEncoder().encode(JWT_SECRET));
 
-    // Create a response, setting the token as an HTTP‑only cookie
-    const response = NextResponse.json({ 
+    const response = NextResponse.json({
       message: "Login successful",
-      user: { id: user.id, email: user.email, name: user.name } // return non-sensitive user info
+      user: { id: user.id, email: user.email, name: user.name, role: user.role },
     });
     response.cookies.set("token", token, {
       httpOnly: true,

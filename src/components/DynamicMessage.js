@@ -52,5 +52,14 @@ export default function DynamicMessage() {
       </div>
     );
   }
+
+  if (pathname === "/admin/dashboard" || "/admin/users" || "/admin/transactions"  && user) {
+    // Fiat balance from wallet (if available)
+   
+
+    return (
+      <h1>Admin Panel</h1>
+    );
+  }
   return <h3>Dive into the Crypto World without risks!</h3>;
 }
