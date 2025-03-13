@@ -93,7 +93,7 @@ export default function CryptoTicker() {
           <input
             type="text"
             className="form-control border-0"
-            placeholder="Search top 100 coins..."
+            placeholder="Search top coins..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
