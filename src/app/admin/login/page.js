@@ -36,7 +36,7 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="container mt-5">
+    <div className="container col-12 col-md-4  mt-5">
       <h2>Admin Login</h2>
       {errorMsg && <p className="text-danger">{errorMsg}</p>}
       <form onSubmit={handleSubmit}>
@@ -68,9 +68,14 @@ export default function AdminLogin() {
             required
           />
         </div>
+        <div className="d-flex justify-content-between">
         <button type="submit" className="btn btn-primary">
           Log In as Admin
         </button>
+        <button type="button" className="btn btn-outline-primary ">
+         <a className="links text-light" href="/">Go to CryptoDance.app</a> 
+        </button>
+        </div>
       </form>
     </div>
   );

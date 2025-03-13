@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useConversionRate } from "@/hooks/useConversionRate";
 import Link from "next/link";
 import CryptoBalance from "./CryptoBalance";
-import AddFundsModal from "./AddFundsModal";
+
 
 export default function DynamicMessage() {
   const { user } = useUser();
@@ -53,7 +53,7 @@ export default function DynamicMessage() {
     );
   }
 
-  if (pathname === "/admin/dashboard" || "/admin/users" || "/admin/transactions"  && user) {
+  if (pathname.startsWith("/admin") && user) {
     // Fiat balance from wallet (if available)
    
 

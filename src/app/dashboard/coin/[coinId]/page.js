@@ -11,7 +11,6 @@ export default function CoinDetails() {
   const params = useParams();
   const { coinId } = params;
   const [coin, setCoin] = useState(null);
-  const [chartData, setChartData] = useState([]);
   const [yearlyHigh, setYearlyHigh] = useState(null);
   const [loading, setLoading] = useState(true);
   const { currency } = useCurrency();

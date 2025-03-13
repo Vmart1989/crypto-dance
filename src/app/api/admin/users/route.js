@@ -11,7 +11,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 async function isAdmin(tokenValue) {
   try {
     const { payload } = await jwtVerify(tokenValue, new TextEncoder().encode(JWT_SECRET));
-    // Assuming your user payload has a role property
+    // user payload has a role property
     return payload.role === "admin";
   } catch (error) {
     return false;

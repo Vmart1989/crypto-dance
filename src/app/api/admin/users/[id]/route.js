@@ -75,19 +75,30 @@ export async function PUT(request, { params }) {
   }
 }
 
-export async function DELETE(request, { params }) {
-  const token = request.cookies.get("token");
-  if (!token || !token.value || !(await isAdmin(token.value))) {
+export async function DELETE(request, context) {
+  
+  const params = await Promise.resolve(context.params);
+  const { id } = params;
+  
+  const tokenObj = request.cookies.get("token");
+  if (!tokenObj || !tokenObj.value || !(await isAdmin(tokenObj.value))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+  
   try {
-    const { id } = params;
-    await prisma.user.delete({
-      where: { id: Number(id) },
-    });
+    // Delete dependent records first, then delete the user
+    await prisma.$transaction([
+      prisma.wallet.deleteMany({ where: { userId: Number(id) } }),
+      prisma.cryptoAsset.deleteMany({ where: { userId: Number(id) } }),
+      prisma.transaction.deleteMany({ where: { userId: Number(id) } }),
+      prisma.user.delete({ where: { id: Number(id) } }),
+    ]);
     return NextResponse.json({ message: "User deleted" });
   } catch (error) {
-    console.error("Error deleting user:", error);
-    return NextResponse.json({ error: "Failed to delete user" }, { status: 500 });
+    console.error("Error deleting user:", error.message);
+    return NextResponse.json(
+      { error: "Failed to delete user: " + error.message },
+      { status: 500 }
+    );
   }
 }
