@@ -21,6 +21,8 @@
 
 # production
 /build
+
+# Ignore database dump
 dump.sql
 
 # misc

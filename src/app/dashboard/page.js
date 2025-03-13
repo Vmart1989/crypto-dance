@@ -1,12 +1,12 @@
 "use client";
 
+import React, { Suspense, useEffect } from "react";
 import { useUser } from "@/context/UserContext";
-import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import DashboardTabs from "@/components/DashboardTabs";
 import AddFundsButton from "@/components/AddFundsModal";
 
-export default function Dashboard() {
+function DashboardContent() {
   const searchParams = useSearchParams();
   const message = searchParams.get("message");
   const { user, setUser } = useUser();
@@ -27,27 +27,28 @@ export default function Dashboard() {
     refreshUser();
   }, [setUser]);
 
-  
-  
   return (
     <div className="container mt-2">
       {message && (
         <div className="alert alert-info" role="alert">
           {message}
         </div>
-        
       )}
       <AddFundsButton />
-      <div className="d-flex col justify-content-between mt-4 ">
+      <div className="d-flex col justify-content-between mt-4">
         <div className="w-100">
-        <DashboardTabs />
-        
+          <DashboardTabs />
         </div>
-        
-      
       </div>
-      
-      {/*dashboard content */}
+      {/* Additional dashboard content can go here */}
     </div>
+  );
+}
+
+export default function Dashboard() {
+  return (
+    <Suspense fallback={<div>Loading Dashboard...</div>}>
+      <DashboardContent />
+    </Suspense>
   );
 }
