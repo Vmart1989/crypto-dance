@@ -21,7 +21,7 @@
 
 # production
 /build
-.dump.sql
+dump.sql
 
 # misc
 .DS_Store
