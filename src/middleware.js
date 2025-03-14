@@ -36,14 +36,19 @@ export async function middleware(request) {
   if (pathname.startsWith("/dashboard")) {
     const token = request.cookies.get("token");
     if (!token || !token.value) {
+      // If no token, redirect to register page.
       return NextResponse.redirect(new URL("/register", request.url));
     }
+
     try {
-      await jwtVerify(
-        token.value,
-        new TextEncoder().encode(JWT_SECRET)
-      );
+      // Attempt to verify the token here
+      await jwtVerify(token.value, new TextEncoder().encode(JWT_SECRET));
+
+      // If the token is valid, allow access
+      return NextResponse.next();
     } catch (error) {
+      console.error("Token verification failed:", error);
+      // If token is invalid, redirect to register page
       return NextResponse.redirect(new URL("/register", request.url));
     }
   }

@@ -25,6 +25,7 @@ export default function CryptoNewsPage() {
         // Take the top 3
         const top6 = allArticles.slice(0, 6);
         setArticles(top6);
+        //console.log(top6);
       } catch (err) {
         console.error("Error fetching news:", err);
         setErrorMsg(err.message);
@@ -62,14 +63,14 @@ export default function CryptoNewsPage() {
               <div className="card-body">
                 {article.image_url && (
                   <img
-                    src={article.image_url}
-                    alt={article.title || "News Image"}
-                    className="card-img-top mb-2"
-                    style={{ objectFit: "cover", maxHeight: "300px" }}
-                    onError={(e) => {
-                      e.target.style.display = "none";
-                    }}
-                  />
+                  src={article.image_url || "/public/coins.webp"}
+                  alt={article.title || "News Image"}
+                  className="card-img-top mb-2"
+                  style={{ objectFit: "cover", maxHeight: "300px" }}
+                  onError={(e) => {
+                    e.target.style.display = "none";
+                  }}
+                />
                 )}
                 <h5 className="card-title">{article.title}</h5>
 
