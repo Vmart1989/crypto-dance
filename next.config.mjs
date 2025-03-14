@@ -4,7 +4,7 @@ const nextConfig = {
     console.log('Rewrites initiated');
     return [
       {
-        source: "/:path*",
+        source: "/",
         has: [
           {
             type: "host",
