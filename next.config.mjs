@@ -10,7 +10,7 @@ const nextConfig = {
                 value: "admin.cryptodance.app"
               }
             ],
-            destination: "/admin/:path*"
+            destination: "/admin/login"
           }
         ];
       }
