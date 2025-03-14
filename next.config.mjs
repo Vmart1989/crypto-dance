@@ -11,7 +11,7 @@ const nextConfig = {
             value: "admin.cryptodance.app"
           }
         ],
-        destination: "/admin/login",
+        destination: "cryptodance.app/admin",
       }
     ];
   },
