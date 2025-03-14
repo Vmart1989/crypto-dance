@@ -46,8 +46,7 @@ export default function UserHeader() {
     </div>
     )
   }
-    // Fiat balance from wallet (if available)
-  //if (user.role = "admin" && PathnameContext.) return <div>Blas</div>
+   
   else 
 
   return (

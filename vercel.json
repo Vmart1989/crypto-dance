@@ -1,0 +1,15 @@
+{
+    "rewrites": [
+      {
+        "source": "/(.*)",
+        "destination": "/admin/login",
+        "has": [
+          {
+            "type": "host",
+            "value": "admin.cryptodance.app"
+          }
+        ]
+      }
+    ]
+  }
+  
