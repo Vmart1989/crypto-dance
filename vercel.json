@@ -1,24 +1,7 @@
 {
-  "rewrites": [
-    {
-      "source": "/:path*",
-      "has": [
-        {
-          "type": "host",
-          "value": "admin.cryptodance.app"
-        }
-      ],
-      "destination": "https://cryptodance.app/admin"
-    },
-    {
-      "source": "/",
-      "has": [
-        {
-          "type": "host",
-          "value": "admin.cryptodance.app"
-        }
-      ],
-      "destination": "https://cryptodance.app/admin"
+  "functions": {
+    "api/redirect.js": {
+      "runtime": "edge"
     }
-  ]
+  }
 }
