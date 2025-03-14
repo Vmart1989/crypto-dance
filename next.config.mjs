@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   async rewrites() {
+    console.log('Rewrites initiated');
     return [
       {
         source: "/:path*",
@@ -10,7 +11,7 @@ const nextConfig = {
             value: "admin.cryptodance.app"
           }
         ],
-        destination: "/admin/login"
+        destination: "/admin/login",
       }
     ];
   },
