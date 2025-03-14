@@ -37,7 +37,7 @@ function computeCoinStats(transactions) {
   return result;
 }
 
-export default function WalletTab() {
+export default function WalletTab({ refreshTrigger }) {
   const { user } = useUser();
   const { currency } = useCurrency();
   const { rate } = useConversionRate(currency);
@@ -54,14 +54,13 @@ export default function WalletTab() {
     setCoinStats(stats);
   }, [user]);
 
-  // 2. Fetch current coin prices for each asset in user.cryptoAssets
+  // 2. Fetch current coin prices for each asset in user.cryptoAssets whenever the refreshTrigger changes
   useEffect(() => {
     async function fetchPrices() {
       if (!user || !user.cryptoAssets) return;
       const fetched = await Promise.all(
         user.cryptoAssets.map(async (asset) => {
           try {
-            // Use coinId if available, else fallback to symbol.
             const endpoint = asset.coinId
               ? asset.coinId.toLowerCase()
               : asset.symbol.toLowerCase();
@@ -94,8 +93,11 @@ export default function WalletTab() {
       );
       setAssetData(fetched);
     }
-    fetchPrices();
-  }, [user]);
+
+    if (refreshTrigger > 0) {
+      fetchPrices(); // Fetch data when refreshTrigger changes (i.e., when the tab is opened)
+    }
+  }, [user, refreshTrigger]); // Re-fetch data when refreshTrigger changes
 
   const totalFiatValueUsd = assetData.reduce((sum, coin) => {
     return sum + coin.balance * coin.priceUsd;
@@ -163,9 +165,7 @@ export default function WalletTab() {
                   Value: {fiatSymbol}
                   {currentValueUsd.toFixed(2)}{" "}
                   <span
-                    className={
-                      coin.change24h >= 0 ? "text-info" : "text-danger"
-                    }
+                    className={coin.change24h >= 0 ? "text-info" : "text-danger"}
                   >
                     ({coin.change24h.toFixed(2)}% / 24h)
                   </span>
