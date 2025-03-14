@@ -1,26 +1,26 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   async rewrites() {
-    console.log('Rewrites initiated');
     return [
       {
-        source: "/",
+        source: "/:path*",  // Matches any path under the admin subdomain
         has: [
           {
             type: "host",
             value: "admin.cryptodance.app"
           }
         ],
-        destination: "cryptodance.app/admin",
-      }
-    ];
-  },
-  async redirects() {
-    return [
+        destination: "https://cryptodance.app/admin"  // Redirect any path to cryptodance.app/admin
+      },
       {
-        source: "/admin",
-        destination: "/admin/login",
-        permanent: true
+        source: "/",  // Explicitly handle the root of the admin subdomain
+        has: [
+          {
+            type: "host",
+            value: "admin.cryptodance.app"
+          }
+        ],
+        destination: "https://cryptodance.app/admin"  // Redirect root to cryptodance.app/admin
       }
     ];
   }
