@@ -4,6 +4,8 @@ import bcrypt from "bcryptjs";
 import { PrismaClient } from "@prisma/client";
 import { SignJWT } from "jose";
 
+// Log the DATABASE_URL to verify it on Vercel
+console.log('Database URL:', process.env.DATABASE_URL);
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 
