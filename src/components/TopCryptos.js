@@ -152,7 +152,7 @@ export default function CryptoTicker() {
               <td className="pb-2">
                 <Link
                   className="text-decoration-none link-light"
-                  href={`/dashboard/coin/${crypto.id}`}
+                  href={`/coin/${crypto.id}`}
                 >
                   <img
                     src={`https://assets.coincap.io/assets/icons/${crypto.symbol.toLowerCase()}@2x.png`}

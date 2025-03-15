@@ -61,5 +61,36 @@ export default function DynamicMessage() {
       <h1>Admin Panel</h1>
     );
   }
+
+  if (pathname.startsWith("/coin") && user) {
+    
+   
+
+    return (
+      <div className="w-100 text-end">
+          <Link className="links" href="/dashboard">
+          <i className="bi bi-arrow-return-left me-1"></i>
+          
+            Dashboard
+          </Link>
+        </div>
+    );
+  }
+  if (pathname.startsWith("/coin") && !user) {
+    
+   
+
+    return (
+      <div className="w-100 text-end">
+          <Link className="links" href="/">
+          <i className="bi bi-arrow-return-left me-1"></i>
+          
+            Home
+          </Link>
+        </div>
+    );
+  }
+
+
   return <h3>Dive into the Crypto World without risks!</h3>;
 }

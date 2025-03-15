@@ -153,7 +153,7 @@ export default function WalletTab({ refreshTrigger }) {
                   />
                   <Link
                     className="text-decoration-none link-light"
-                    href={`/dashboard/coin/${coin.coinId}`}
+                    href={`/coin/${coin.coinId}`}
                   >
                     <h5 className="m-0 ">
                       {coin.name} ({coin.symbol})
