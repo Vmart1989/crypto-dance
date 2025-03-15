@@ -105,13 +105,13 @@ export default function RegisterForm() {
               autoComplete="new-password"
             />
             </div>
-            <div className="">
+            <div>
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="form-control border-0 bg-transparent"
             >
-              {showPassword ?  <i class="bi bi-eye-slash"></i> : <i class="bi bi-eye"></i>}
+              {showPassword ?  <i className="bi bi-eye-slash"></i> : <i className="bi bi-eye"></i>}
             </button>
             </div>
             </div>
