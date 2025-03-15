@@ -41,8 +41,10 @@ export default function RegisterForm() {
   };
 
   return (
+    <div>
+      <main className="container mt-5 mb-5">
     <div className="row justify-content-center">
-      <div className="col-10 order-2 col-md-3 border border-primary rounded m-5 p-3">
+      <div className="order-2 col-11 col-md-3 border border-primary rounded m-5 p-3">
         {user ? (
           // If the user is logged in, show a welcome message and a button to go to the dashboard
           <>
@@ -63,7 +65,7 @@ export default function RegisterForm() {
         )}
       </div>
 
-      <div className="col-10 col-md-6 border border-primary rounded p-3 my-5">
+      <div className="col-11 col-md-7 border border-primary rounded p-3 my-5">
         <h3>Register Now For Full Access</h3>
         <form onSubmit={handleRegister}>
           <div className="mb-3">
@@ -122,6 +124,8 @@ export default function RegisterForm() {
           </button>
         </form>
       </div>
+    </div>
+    </main>
     </div>
   );
 }

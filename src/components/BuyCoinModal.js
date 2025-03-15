@@ -79,9 +79,9 @@ export default function BuyCoinModal({
 
   return (
     <>
-      {pathname.startsWith("/dashboard/coin/") ? (
-        <button className="btn btn-primary mt-2" onClick={handleOpen}>
-          Buy {coin.symbol}
+      {pathname.startsWith("/coin/") && !user ? (
+        <button className="btn btn-primary mt-2" > <a className="text-light links" href="/register">
+          Buy {coin.symbol}</a>
         </button>
       ) : (
         <span onClick={handleOpen} style={{ cursor: "pointer" }} title="Buy Coin">
