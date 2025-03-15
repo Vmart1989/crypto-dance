@@ -38,7 +38,7 @@ function DashboardContent() {
         const url = new URL(window.location);
         url.searchParams.delete("message");
         window.history.replaceState(null, "", url.toString()); // Update the URL
-      }, 5000); // 5000 ms = 5 seconds
+      }, 3000); // 3 seconds
 
       return () => clearTimeout(timer); // Clean up the timer if the component is unmounted
     }

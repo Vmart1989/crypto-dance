@@ -5,7 +5,10 @@ import { PrismaClient } from "@prisma/client";
 import { SignJWT } from "jose";
 
 const prisma = new PrismaClient();
-const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
+if (!process.env.JWT_SECRET) {
+  throw new Error("Missing JWT_SECRET environment variable");
+}
+const JWT_SECRET = process.env.JWT_SECRET;
 
 export async function POST(request) {
   try {

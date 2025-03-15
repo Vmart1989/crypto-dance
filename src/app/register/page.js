@@ -63,12 +63,12 @@ export default function RegisterForm() {
         )}
       </div>
 
-      <div className="col-10 col-md-6 border border-primary rounded p-3 my-5 text-center">
+      <div className="col-10 col-md-6 border border-primary rounded p-3 my-5">
         <h3>Register Now For Full Access</h3>
         <form onSubmit={handleRegister}>
           <div className="mb-3">
             <input
-              className="w-100 text-center"
+              className="w-100 form-control"
               type="text"
               placeholder="Name"
               value={name}
@@ -81,7 +81,7 @@ export default function RegisterForm() {
           </div>
           <div className="mb-3">
             <input
-              className="w-100 text-center"
+              className="w-100 form-control"
               type="email"
               placeholder="Email"
               value={email}
@@ -92,9 +92,9 @@ export default function RegisterForm() {
           </div>
           <div className="mb-3">
             <div className="d-flex w-100 justify-content-between">
-            <div className="w-75">
+            <div className="w-100">
             <input
-              className="w-100 text-center"
+              className="w-100 form-control"
               type={showPassword ? "text" : "password"} // Toggle input type based on state
               placeholder="Password (min. 8 characters)"
               value={password}
@@ -105,13 +105,13 @@ export default function RegisterForm() {
               autoComplete="new-password"
             />
             </div>
-            <div className="w-25">
+            <div className="">
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="btn btn-outline-secondary border-0 border-hover-0 btn-sm  w-100"
+              className="form-control border-0 bg-transparent"
             >
-              {showPassword ? "Hide Password" : "Show Password"}
+              {showPassword ?  <i class="bi bi-eye-slash"></i> : <i class="bi bi-eye"></i>}
             </button>
             </div>
             </div>
