@@ -7,11 +7,14 @@ import { UserProvider } from "../context/UserContext";
 import DynamicMessage from "@/components/DynamicMessage";
 import UserHeader from "@/components/UserHeader";
 import Link from "next/link";
-import Script from 'next/script';
+import Script from "next/script";
 
 const teko = Teko({ subsets: ["latin"], weight: ["400", "700"] });
 const oswald = Oswald({ weight: ["400", "700"], subsets: ["latin"] });
-const openSans = Open_Sans({ subsets: ["latin"], weight: ["400", "600", "700"] });
+const openSans = Open_Sans({
+  subsets: ["latin"],
+  weight: ["400", "600", "700"],
+});
 
 export const metadata = {
   metadataBase: new URL("https://cryptodance.app"),
@@ -19,7 +22,8 @@ export const metadata = {
     default: "CryptoDance – Cryptocurrency Trading Simulator",
     template: "%s | CryptoDance",
   },
-  description: "CryptoDance is an interactive cryptocurrency trading simulator. Learn crypto basics, simulate trades, and track cryptocurrency markets in real-time.",
+  description:
+    "CryptoDance is an interactive cryptocurrency trading simulator. Learn crypto basics, simulate trades, and track cryptocurrency markets in real-time.",
   keywords: [
     "cryptocurrency",
     "trading simulator",
@@ -43,12 +47,13 @@ export const metadata = {
   ],
   openGraph: {
     title: "CryptoDance – Cryptocurrency Trading Simulator",
-    description: "Learn cryptocurrency basics and simulate trading with real-time crypto market data.",
+    description:
+      "Learn cryptocurrency basics and simulate trading with real-time crypto market data.",
     url: "https://cryptodance.app",
     siteName: "CryptoDance",
     images: [
       {
-        url: "/og-image.png", 
+        url: "/og-image.png",
         width: 1200,
         height: 630,
         alt: "CryptoDance - Cryptocurrency Trading Simulator",
@@ -60,7 +65,8 @@ export const metadata = {
   twitter: {
     card: "summary_large_image",
     title: "CryptoDance – Cryptocurrency Trading Simulator",
-    description: "Learn crypto and simulate trading in real-time with CryptoDance.",
+    description:
+      "Learn crypto and simulate trading in real-time with CryptoDance.",
     images: ["/og-image.png"],
     creator: "@yourtwitterhandle", // replace with your actual handle
   },
@@ -82,7 +88,23 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={oswald.className}>
-      <link
+        <head>
+          {/* Google Analytics 4 */}
+          <Script
+            async
+            src={`https://www.googletagmanager.com/gtag/js?id=G-48WTNGSD0T`}
+          />
+          <Script id="google-analytics">
+            {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-48WTNGSD0T');
+          `}
+          </Script>
+        </head>
+        <link
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
         />
@@ -96,10 +118,18 @@ export default function RootLayout({ children }) {
             {/* HEADER */}
             <div className="container">
               <header className="d-flex flex-wrap justify-content-center py-3 mb-4 ">
-                <a href="/" className="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
+                <a
+                  href="/"
+                  className="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none"
+                >
                   <h1>
                     <span className="display-1 text-primary fw-bold">
-                      <img src="/logo.png" width="90px" alt="CryptoDance Logo" /> CryptoDance
+                      <img
+                        src="/logo.png"
+                        width="90px"
+                        alt="CryptoDance Logo"
+                      />{" "}
+                      CryptoDance
                     </span>
                   </h1>
                 </a>
@@ -128,20 +158,49 @@ export default function RootLayout({ children }) {
                   <div>
                     <ul className="nav justify-content-start pb-3 mb-3">
                       <li className="nav-item">
-                        <Link className="nav-link px-2 text-body-secondary link-underline-opacity-0" href="/">Home</Link>
+                        <Link
+                          className="nav-link px-2 text-body-secondary link-underline-opacity-0"
+                          href="/"
+                        >
+                          Home
+                        </Link>
                       </li>
-                      <li className="nav-item"><a href="#" className="nav-link px-2 text-body-secondary">Features</a></li>
-                      <li className="nav-item"><a href="#" className="nav-link px-2 text-body-secondary">FAQs</a></li>
-                      <li className="nav-item"><a href="#" className="nav-link px-2 text-body-secondary">About</a></li>
+                      <li className="nav-item">
+                        <a
+                          href="#"
+                          className="nav-link px-2 text-body-secondary"
+                        >
+                          Features
+                        </a>
+                      </li>
+                      <li className="nav-item">
+                        <a
+                          href="#"
+                          className="nav-link px-2 text-body-secondary"
+                        >
+                          FAQs
+                        </a>
+                      </li>
+                      <li className="nav-item">
+                        <a
+                          href="#"
+                          className="nav-link px-2 text-body-secondary"
+                        >
+                          About
+                        </a>
+                      </li>
                     </ul>
                   </div>
                   <div>
                     <p className="px-2 text-body-secondary">
-                      Market data provided by <a href="https://www.coincap.io/">Coincap.io</a>
+                      Market data provided by{" "}
+                      <a href="https://www.coincap.io/">Coincap.io</a>
                     </p>
                   </div>
                 </div>
-                <p className="text-start text-secondary">© {new Date().getFullYear()} vmart.dev</p>
+                <p className="text-start text-secondary">
+                  © {new Date().getFullYear()} vmart.dev
+                </p>
               </footer>
             </div>
           </UserProvider>
