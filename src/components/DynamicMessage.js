@@ -92,5 +92,5 @@ export default function DynamicMessage() {
   }
 
 
-  return <h3>Dive into the Crypto World without risks!</h3>;
+  return <h2>Dive into the Crypto World without risks!</h2>;
 }
