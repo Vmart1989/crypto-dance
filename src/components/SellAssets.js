@@ -117,7 +117,7 @@ export default function SellAssets() {
               <th></th>
               <th className="fw-light">Quantity</th>
               <th className="fw-light">Value</th>
-              <th className="fw-light">24h Change</th>
+              <th className="fw-light d-none d-md-table-cell">24h Change</th>
             </tr>
           </thead>
           <tbody>
@@ -192,7 +192,7 @@ export default function SellAssets() {
                     {symbol}
                     {formatCurrency(fiatValue)}
                   </td>
-                  <td>
+                  <td className="d-none d-md-table-cell">
                     <span className={changePercent24Hr >= 0 ? "text-info" : "text-danger"}>
                       {changePercent24Hr.toFixed(2)}%
                     </span>
