@@ -46,15 +46,14 @@ export default function WalletTab({ refreshTrigger }) {
 
   const [assetData, setAssetData] = useState([]);
   const [coinStats, setCoinStats] = useState({});
+  const [totalUnrealized, setTotalUnrealized] = useState(0);
 
-  // 1. Compute coinStats from transactions
   useEffect(() => {
     if (!user || !user.transactions) return;
     const stats = computeCoinStats(user.transactions);
     setCoinStats(stats);
   }, [user]);
 
-  // 2. Fetch current coin prices for each asset in user.cryptoAssets whenever the refreshTrigger changes
   useEffect(() => {
     async function fetchPrices() {
       if (!user || !user.cryptoAssets) return;
@@ -64,9 +63,7 @@ export default function WalletTab({ refreshTrigger }) {
             const endpoint = asset.coinId
               ? asset.coinId.toLowerCase()
               : asset.symbol.toLowerCase();
-            const res = await fetch(
-              `https://api.coincap.io/v2/assets/${endpoint}`
-            );
+            const res = await fetch(`https://api.coincap.io/v2/assets/${endpoint}`);
             const json = await res.json();
             if (!json.data) {
               throw new Error(`No data for ${asset.symbol}`);
@@ -84,7 +81,7 @@ export default function WalletTab({ refreshTrigger }) {
             return {
               symbol: asset.symbol,
               balance: asset.balance,
-              name: asset.symbol, // fallback name
+              name: asset.symbol,
               priceUsd: 0,
               change24h: 0,
             };
@@ -95,9 +92,21 @@ export default function WalletTab({ refreshTrigger }) {
     }
 
     if (refreshTrigger > 0) {
-      fetchPrices(); // Fetch data when refreshTrigger changes (i.e., when the tab is opened)
+      fetchPrices();
     }
-  }, [user, refreshTrigger]); // Re-fetch data when refreshTrigger changes
+  }, [user, refreshTrigger]);
+
+  useEffect(() => {
+    let total = 0;
+    assetData.forEach((coin) => {
+      const key = coin.symbol.toLowerCase();
+      const stats = coinStats[key] || { fiatInvested: 0 };
+      const currentValueFiat = coin.balance * coin.priceUsd * rate;
+      const fiatInvestedFiat = stats.fiatInvested * rate;
+      total += currentValueFiat - fiatInvestedFiat;
+    });
+    setTotalUnrealized(total);
+  }, [assetData, coinStats, rate]);
 
   const totalFiatValueUsd = assetData.reduce((sum, coin) => {
     return sum + coin.balance * coin.priceUsd;
@@ -114,7 +123,19 @@ export default function WalletTab({ refreshTrigger }) {
     <div className={styles.tickerContainer}>
       <h2>Crypto Assets</h2>
 
-      <div className="d-flex flex-wrap gap-3 ">
+      <div className="mb-4 p-3 rounded dark-bg lh-1" style={{ maxWidth: "400px" }}>
+        <h4>
+          Total Unrealized P/L:{" "}
+          <span className={totalUnrealized >= 0 ? "text-info" : "text-danger"}>
+            {fiatSymbol}
+            {totalUnrealized >= -0.09
+              ? formatFiat(totalUnrealized.toFixed(2))
+              : formatFiat(totalUnrealized.toFixed(4))}
+          </span>
+        </h4>
+      </div>
+
+      <div className="d-flex flex-wrap gap-3">
         {assetData.length === 0 ? (
           <p>You do not own any crypto assets.</p>
         ) : (
@@ -133,47 +154,31 @@ export default function WalletTab({ refreshTrigger }) {
             return (
               <div
                 key={coin.symbol}
-                className="p-3 rounded flex-fill dark-bg lh-1 "
+                className="p-3 rounded flex-fill dark-bg lh-1"
                 style={{ minWidth: "250px", maxWidth: "300px" }}
               >
-                <div className="d-flex align-items-center mb-4 ">
+                <div className="d-flex align-items-center mb-4">
                   <img
-                    src={`https://assets.coincap.io/assets/icons/${
-                      coin.symbol.toLowerCase() // Ideally, this should be the correct icon key
-                    }@2x.png`}
+                    src={`https://assets.coincap.io/assets/icons/${coin.symbol.toLowerCase()}@2x.png`}
                     alt={coin.name}
-                    style={{
-                      width: "32px",
-                      height: "32px",
-                      marginRight: "0.5rem",
-                    }}
-                    onError={(e) => {
-                      e.target.style.display = "none";
-                    }}
+                    style={{ width: "32px", height: "32px", marginRight: "0.5rem" }}
+                    onError={(e) => (e.target.style.display = "none")}
                   />
-                  <Link
-                    className="text-decoration-none link-light"
-                    href={`/coin/${coin.coinId}`}
-                  >
-                    <h5 className="m-0 ">
+                  <Link href={`/coin/${coin.coinId}`} className="text-decoration-none link-light">
+                    <h5 className="m-0">
                       {coin.name} ({coin.symbol})
                     </h5>
                   </Link>
                 </div>
-                <p>Balance: {coin.balance.toFixed(2)} </p>
+                <p>Balance: {coin.balance.toFixed(2)}</p>
                 <p>
                   Value: {fiatSymbol}
-                  {currentValueUsd.toFixed(2)}{" "}
-                  <span
-                    className={coin.change24h >= 0 ? "text-info" : "text-danger"}
-                  >
+                  {formatFiat(currentValueFiat)}{" "}
+                  <span className={coin.change24h >= 0 ? "text-info" : "text-danger"}>
                     ({coin.change24h.toFixed(2)}% / 24h)
                   </span>
                 </p>
-                <p>
-                  Fiat Invested: {fiatSymbol}
-                  {formatFiat(fiatInvestedFiat)}
-                </p>
+                <p>Fiat Invested: {fiatSymbol}{formatFiat(fiatInvestedFiat)}</p>
                 <p>
                   Average Cost: {fiatSymbol}
                   {stats.averageCost * rate > 0.009
@@ -183,15 +188,8 @@ export default function WalletTab({ refreshTrigger }) {
                 <p>Portfolio Diversity: {diversityPct}%</p>
                 <p>
                   Unrealized P/L:{" "}
-                  <span
-                    className={unrealized >= 0 ? "text-info" : "text-danger"}
-                  >
-                    {fiatSymbol}
-                    {unrealized === 0
-                      ? "0"
-                      : unrealized > -0.09
-                      ? formatFiat(unrealized.toFixed(2))
-                      : formatFiat(unrealized.toFixed(4))}
+                  <span className={unrealized >= 0 ? "text-info" : "text-danger"}>
+                    {fiatSymbol}{formatFiat(unrealized)}
                   </span>
                 </p>
               </div>
