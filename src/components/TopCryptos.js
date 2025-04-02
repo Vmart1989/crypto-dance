@@ -35,7 +35,7 @@ export default function CryptoTicker() {
       }
     }
     fetchCryptos();
-    const interval = setInterval(fetchCryptos, 60000);
+    const interval = setInterval(fetchCryptos, 500000);
     return () => clearInterval(interval);
   }, []);
 
