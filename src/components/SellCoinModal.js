@@ -85,9 +85,9 @@ export default function SellCoinModal({ asset, currency }) {
                 <div className="modal-header">
                   <div className="d-flex align-items-center">
                     <img
-                      src={`https://assets.coincap.io/assets/icons/${
-                        (asset.assetSymbol || asset.symbol).toLowerCase()
-                      }@2x.png`}
+                      src={`/icons/${
+                        (asset.assetSymbol || asset.symbol)
+                      }.png`}
                       alt={asset.assetName || asset.symbol}
                       style={{
                         width: "30px",

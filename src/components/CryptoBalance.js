@@ -35,10 +35,9 @@ export default function CryptoBalance({ user, fiatSymbol }) {
                 : asset.symbol.toLowerCase();
 
               try {
-                const res = await fetch(
-                  `https://api.coincap.io/v2/assets/${endpoint}`
-                );
+                const res = await fetch(`/api/crypto?id=${endpoint}`);
                 const json = await res.json();
+                
 
                 // If json.data is missing or empty, mark null
                 if (!json.data) {

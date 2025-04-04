@@ -1,6 +1,6 @@
 export async function GET() {
     try {
-      const res = await fetch("https://api.coincap.io/v2/assets?limit=100", {
+      const res = await fetch("https://rest.coincap.io/v3/assets?limit=100", {
         headers: {
           "Authorization": `Bearer ${process.env.COINCAP_API_KEY}` // if the API uses Bearer tokens
           

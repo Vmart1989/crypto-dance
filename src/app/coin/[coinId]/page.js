@@ -22,12 +22,12 @@ export default function CoinDetails() {
     async function fetchCoinData() {
       try {
         // Fetch coin details
-        const resCoin = await fetch(`https://api.coincap.io/v2/assets/${coinId}`);
+        const resCoin = await fetch(`/api/crypto?id=${coinId}`);
         const coinJson = await resCoin.json();
 
         // Fetch daily history for the past 7 days
         const resHistory = await fetch(
-          `https://api.coincap.io/v2/assets/${coinId}/history?interval=d1`
+          `/api/crypto-history?id=${coinId}&interval=d1`
         );
         const historyJson = await resHistory.json();
 
@@ -52,11 +52,13 @@ export default function CoinDetails() {
         const start = oneYearAgo.getTime();
 
         const resYear = await fetch(
-          `https://api.coincap.io/v2/assets/${coinId}/history?interval=d1&start=${start}&end=${end}`
+          `/api/crypto-history?id=${coinId}&interval=d1&start=${start}&end=${end}`
         );
         const yearJson = await resYear.json();
         if (yearJson.data && yearJson.data.length > 0) {
-          const maxPrice = Math.max(...yearJson.data.map((point) => Number(point.priceUsd)));
+          const maxPrice = Math.max(
+            ...yearJson.data.map((point) => Number(point.priceUsd))
+          );
           setYearlyHigh(maxPrice);
         }
       } catch (err) {
@@ -91,11 +93,13 @@ export default function CoinDetails() {
       <div className="p-4 bg-dark rounded-2">
         <div className="d-flex flex-column flex-md-row justify-content-between mb-2 w-100">
           <div className="d-flex align-items-center">
-            <img
-              src={`https://assets.coincap.io/assets/icons/${coin.symbol.toLowerCase() || "default"}@2x.png`}
-              alt={coin.name}
-              style={{ width: "50px", height: "50px", marginRight: "1rem" }}
-            />
+            {coin?.symbol && (
+              <img
+                src={`/icons/${coin.symbol.toLowerCase()}.png`}
+                alt={coin.name || "coin"}
+                style={{ width: "50px", height: "50px", marginRight: "1rem" }}
+              />
+            )}
             <h2 className="fs-1">
               {coin.name} ({coin.symbol})
             </h2>
@@ -105,7 +109,9 @@ export default function CoinDetails() {
             {formatPrice(convertValue(coin.priceUsd))}{" "}
             <span
               className={
-                Number(coin.changePercent24Hr) >= 0 ? "text-info" : "text-danger"
+                Number(coin.changePercent24Hr) >= 0
+                  ? "text-info"
+                  : "text-danger"
               }
             >
               ({Number(coin.changePercent24Hr).toFixed(2)}%)
@@ -117,13 +123,15 @@ export default function CoinDetails() {
           </h4>
         </div>
         {/* Pass coinId from the fetched coin data */}
-        <BuyCoinModal
-          coin={coin}
-          convertValue={convertValue}
-          symbol={symbol}
-          coinId={coin.id} 
-          image={`https://assets.coincap.io/assets/icons/${coin.symbol.toLowerCase()}@2x.png`}
-        />
+        {coin?.symbol && (
+          <BuyCoinModal
+            coin={coin}
+            convertValue={convertValue}
+            symbol={symbol}
+            coinId={coin.id}
+            image={`https://assets.coincap.io/assets/icons/${coin.symbol.toLowerCase()}@2x.png`}
+          />
+        )}
       </div>
       <div className="p-4 flex-column flex-md-row bg-dark rounded-2 d-flex justify-content-between">
         <div className="fs-5">

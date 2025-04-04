@@ -42,8 +42,8 @@ export default function SellAssets() {
         ? row.coinId.toLowerCase()
         : row.symbol.toLowerCase();
       try {
-        const res = await fetch(`https://api.coincap.io/v2/assets/${endpoint}`);
-        const json = await res.json();
+        const res = await fetch(`/api/crypto?id=${endpoint}`);
+                const json = await res.json();
 
         if (!json.data) {
           throw new Error(`No data for ${endpoint}`);
@@ -165,7 +165,7 @@ export default function SellAssets() {
                   <td>
                     {assetSymbol ? (
                       <img
-                        src={`https://assets.coincap.io/assets/icons/${assetSymbol.toLowerCase()}@2x.png`}
+                        src={`/icons/${assetSymbol.toLowerCase()}.png`}
                         alt={assetName || row.symbol}
                         style={{
                           width: "30px",

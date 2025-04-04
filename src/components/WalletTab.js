@@ -63,8 +63,8 @@ export default function WalletTab({ refreshTrigger }) {
             const endpoint = asset.coinId
               ? asset.coinId.toLowerCase()
               : asset.symbol.toLowerCase();
-            const res = await fetch(`https://api.coincap.io/v2/assets/${endpoint}`);
-            const json = await res.json();
+              const res = await fetch(`/api/crypto?id=${endpoint}`);
+              const json = await res.json();
             if (!json.data) {
               throw new Error(`No data for ${asset.symbol}`);
             }
@@ -159,7 +159,7 @@ export default function WalletTab({ refreshTrigger }) {
               >
                 <div className="d-flex align-items-center mb-4">
                   <img
-                    src={`https://assets.coincap.io/assets/icons/${coin.symbol.toLowerCase()}@2x.png`}
+                    src={`/icons/${coin.symbol.toLowerCase()}.png`}
                     alt={coin.name}
                     style={{ width: "32px", height: "32px", marginRight: "0.5rem" }}
                     onError={(e) => (e.target.style.display = "none")}

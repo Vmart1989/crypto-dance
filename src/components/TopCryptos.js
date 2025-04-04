@@ -9,6 +9,7 @@ import { sortCryptos } from "../utils/sortCryptos";
 import BuyCoinModal from "./BuyCoinModal";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 
 export default function CryptoTicker() {
   const [cryptos, setCryptos] = useState([]);
@@ -143,7 +144,7 @@ export default function CryptoTicker() {
                     convertValue={convertValue}
                     symbol={fiatSymbol}
                     coinId={crypto.id}
-                    image={`https://assets.coincap.io/assets/icons/${crypto.symbol.toLowerCase()}@2x.png`}
+                    image={`/icons/${crypto.symbol.toLowerCase()}.png`}
                   />
                 ) : (
                   crypto.rank
@@ -154,11 +155,12 @@ export default function CryptoTicker() {
                   className="text-decoration-none link-light"
                   href={`/coin/${crypto.id}`}
                 >
-                  <img
-                    src={`https://assets.coincap.io/assets/icons/${crypto.symbol.toLowerCase()}@2x.png`}
+                  <Image
+                    src={`/icons/${crypto.symbol.toLowerCase()}.png`}
                     alt={crypto.name}
                     width="24"
                     height="24"
+                    loading="lazy" 
                     onError={(e) => {
                       e.target.style.display = "none";
                     }}

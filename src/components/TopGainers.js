@@ -66,7 +66,7 @@ export default function TopGainers() {
                 <tr key={crypto.id}>
                   <td className="text-light">
                     <img
-                      src={`https://assets.coincap.io/assets/icons/${crypto.symbol.toLowerCase()}@2x.png`}
+                      src={`/icons/${crypto.symbol.toLowerCase()}.png`}
                       alt={crypto.name}
                       width="24"
                       height="24"
