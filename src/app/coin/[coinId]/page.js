@@ -6,6 +6,8 @@ import { useConversionRate } from "@/hooks/useConversionRate";
 import { useCurrency } from "@/context/CurrencyContext";
 import PriceHistoryChart from "@/components/PriceHistoryChart";
 import BuyCoinModal from "@/components/BuyCoinModal";
+import { useUser } from "@/context/UserContext";
+import Link from "next/link";
 
 export default function CoinDetails() {
   const params = useParams();
@@ -16,6 +18,7 @@ export default function CoinDetails() {
   const [loading, setLoading] = useState(true);
   const { currency } = useCurrency();
   const { rate } = useConversionRate(currency);
+  const { user } = useUser();
 
   // Fetch coin details and 7-day history
   useEffect(() => {
@@ -192,12 +195,26 @@ export default function CoinDetails() {
           )}
         </div>
       </div>
-      <PriceHistoryChart
-        coinId={coinId}
-        convertValue={convertValue}
-        coin={coin}
-        symbol={symbol}
-      />
+      {user ? (
+  <PriceHistoryChart
+    coinId={coinId}
+    convertValue={convertValue}
+    coin={coin}
+    symbol={symbol}
+  />
+) : (
+  <div className="p-4 mt-3 bg-dark rounded-2 text-center border border-secondary">
+   <p className="mb-0 text-muted">
+  <strong>
+    <Link href="/register" className="text-primary text-decoration-underline">
+      Login
+    </Link>{" "}
+    to see full history charts.
+  </strong>
+</p>
+  </div>
+)}
+
     </div>
   );
 }
