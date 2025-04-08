@@ -8,13 +8,33 @@ import { useState, useEffect } from "react";
 import SellCoinModal from "./SellCoinModal";
 import CryptoBalance from "./CryptoBalance";
 
+// Fallback-safe coin icon component
+const CoinIcon = ({ symbol, name, size = 30 }) => {
+  const [imgSrc, setImgSrc] = useState(`/icons/${symbol.toLowerCase()}.png`);
+
+  return (
+    <img
+      src={imgSrc}
+      alt={name}
+      width={size}
+      height={size}
+      style={{
+        width: `${size}px`,
+        height: `${size}px`,
+        marginRight: "0.5rem",
+        verticalAlign: "middle",
+      }}
+      onError={() => setImgSrc("/icons/token.png")}
+    />
+  );
+};
+
 export default function SellAssets() {
   const { user } = useUser();
   const { currency } = useCurrency();
   const { rate } = useConversionRate(currency);
   const symbol = currency === "USD" ? "$" : "€";
 
-  // Row-level state: each row can have { id, symbol, coinId, balance, loading, data, error }
   const [rows, setRows] = useState([]);
 
   useEffect(() => {
@@ -23,11 +43,10 @@ export default function SellAssets() {
       return;
     }
 
-    // Create initial rows, now including coinId from the database
     const initialRows = user.cryptoAssets.map((asset) => ({
       id: asset.id,
-      symbol: asset.symbol,        // e.g. "BTC", "ETH"
-      coinId: asset.coinId,        // e.g. "bitcoin", "ethereum"
+      symbol: asset.symbol,
+      coinId: asset.coinId,
       balance: asset.balance,
       loading: true,
       data: null,
@@ -36,51 +55,45 @@ export default function SellAssets() {
 
     setRows(initialRows);
 
-    // Fetch data for each row individually using coinId (fallback to symbol if missing)
     initialRows.forEach(async (row) => {
       const endpoint = row.coinId
         ? row.coinId.toLowerCase()
         : row.symbol.toLowerCase();
       try {
         const res = await fetch(`/api/crypto?id=${endpoint}`);
-                const json = await res.json();
+        const json = await res.json();
 
         if (!json.data) {
           throw new Error(`No data for ${endpoint}`);
         }
 
         setRows((prev) =>
-          prev.map((r) => {
-            if (r.id === row.id) {
-              return {
-                ...r,
-                loading: false,
-                data: {
-                  currentPriceUsd: Number(json.data.priceUsd),
-                  changePercent24Hr: Number(json.data.changePercent24Hr),
-                  assetSymbol: json.data.symbol,
-                  assetName: json.data.name,
-                },
-              };
-            }
-            return r;
-          })
+          prev.map((r) =>
+            r.id === row.id
+              ? {
+                  ...r,
+                  loading: false,
+                  data: {
+                    currentPriceUsd: Number(json.data.priceUsd),
+                    changePercent24Hr: Number(json.data.changePercent24Hr),
+                    assetSymbol: json.data.symbol,
+                    assetName: json.data.name,
+                  },
+                }
+              : r
+          )
         );
       } catch (error) {
         console.error("Error fetching asset data for", row.symbol, error);
         setRows((prev) =>
-          prev.map((r) => {
-            if (r.id === row.id) {
-              return { ...r, loading: false, error: "Failed to load" };
-            }
-            return r;
-          })
+          prev.map((r) =>
+            r.id === row.id ? { ...r, loading: false, error: "Failed to load" } : r
+          )
         );
       }
     });
   }, [user]);
 
-  // Helper function to format currency
   const formatCurrency = (value) => {
     const locale = currency === "USD" ? "en-US" : "de-DE";
     return Number(value).toLocaleString(locale, {
@@ -89,9 +102,7 @@ export default function SellAssets() {
     });
   };
 
-  // Sort rows by highest fiat value among those that have data
   const sortedRows = [...rows].sort((a, b) => {
-    // If either row is loading or has error, push it to the bottom
     if (a.loading || a.error) return 1;
     if (b.loading || b.error) return -1;
 
@@ -143,7 +154,12 @@ export default function SellAssets() {
                 );
               }
 
-              const { assetSymbol, assetName, currentPriceUsd, changePercent24Hr } = row.data;
+              const {
+                assetSymbol,
+                assetName,
+                currentPriceUsd,
+                changePercent24Hr,
+              } = row.data;
               const fiatValue = row.balance * currentPriceUsd * rate;
 
               return (
@@ -153,7 +169,7 @@ export default function SellAssets() {
                       asset={{
                         id: row.id,
                         symbol: row.symbol,
-                        coinId: row.coinId || row.symbol, // fallback to symbol if coinId is missing
+                        coinId: row.coinId || row.symbol,
                         balance: row.balance,
                         currentPriceUsd,
                         assetName,
@@ -163,28 +179,7 @@ export default function SellAssets() {
                     />
                   </td>
                   <td>
-                    {assetSymbol ? (
-                      <img
-                        src={`/icons/${assetSymbol.toLowerCase()}.png`}
-                        alt={assetName || row.symbol}
-                        style={{
-                          width: "30px",
-                          height: "30px",
-                          marginRight: "0.5rem",
-                        }}
-                      />
-                    ) : (
-                      <div
-                        style={{
-                          width: "30px",
-                          height: "30px",
-                          marginRight: "0.5rem",
-                          backgroundColor: "#444",
-                          display: "inline-block",
-                        }}
-                        title="No image"
-                      />
-                    )}
+                    <CoinIcon symbol={assetSymbol} name={assetName || row.symbol} />
                     {assetName || row.symbol}
                   </td>
                   <td>{row.balance}</td>

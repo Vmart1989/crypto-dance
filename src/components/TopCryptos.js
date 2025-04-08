@@ -11,6 +11,22 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 
+// Fallback image wrapper component
+const CoinIcon = ({ symbol, name }) => {
+  const [imgSrc, setImgSrc] = useState(`/icons/${symbol.toLowerCase()}.png`);
+
+  return (
+    <Image
+      src={imgSrc}
+      alt={name}
+      width={24}
+      height={24}
+      loading="lazy"
+      onError={() => setImgSrc('/icons/token.png')}
+    />
+  );
+};
+
 export default function CryptoTicker() {
   const [cryptos, setCryptos] = useState([]);
   const [cryptosLoading, setCryptosLoading] = useState(true);
@@ -43,7 +59,6 @@ export default function CryptoTicker() {
   const convertValue = (value) => Number(value) * rate;
   const fiatSymbol = currency === "USD" ? "$" : "€";
 
-  // filter list based on the search query
   const filteredCryptos = useMemo(() => {
     const query = search.toLowerCase();
     if (!Array.isArray(cryptos)) return [];
@@ -54,12 +69,10 @@ export default function CryptoTicker() {
     );
   }, [cryptos, search]);
 
-  // compute the sorted list from cryptos using sortConfig
   const sortedCryptos = useMemo(() => {
     return sortCryptos(cryptos, sortConfig);
   }, [cryptos, sortConfig]);
 
-  // Use the filtered list if there is a search query; otherwise, use the sorted list.
   const displayCryptos = search.trim() !== "" ? filteredCryptos : sortedCryptos;
 
   const handleSort = (key) => {
@@ -79,8 +92,6 @@ export default function CryptoTicker() {
     return sortConfig.direction === "asc" ? " ▲" : " ▼";
   };
 
-  // Define combined loading: we show spinner if cryptos are still loading
-  // (conversion rate loading is less important if cryptos are already loaded)
   const isLoading = cryptosLoading;
 
   return (
@@ -137,7 +148,6 @@ export default function CryptoTicker() {
           {displayCryptos.map((crypto) => (
             <tr key={crypto.id}>
               <td className="ps-2 pb-2 text-primary">
-                {/* Conditionally render the buy icon only when on the dashboard */}
                 {pathname === "/dashboard" ? (
                   <BuyCoinModal
                     coin={crypto}
@@ -155,16 +165,7 @@ export default function CryptoTicker() {
                   className="text-decoration-none link-light"
                   href={`/coin/${crypto.id}`}
                 >
-                  <Image
-                    src={`/icons/${crypto.symbol.toLowerCase()}.png`}
-                    alt={crypto.name}
-                    width="24"
-                    height="24"
-                    loading="lazy" 
-                    onError={(e) => {
-                      e.target.style.display = "none";
-                    }}
-                  />{" "}
+                  <CoinIcon symbol={crypto.symbol} name={crypto.name} />{" "}
                   {crypto.name}
                 </Link>
               </td>
