@@ -2,6 +2,25 @@
 
 import { useEffect, useState } from "react";
 import styles from "./TopGainers.module.css"; 
+import Image from "next/image";
+import Link from "next/link";
+
+// Fallback image wrapper component
+const CoinIcon = ({ symbol, name }) => {
+  const [imgSrc, setImgSrc] = useState(`/icons/${symbol.toLowerCase()}.png`);
+
+  return (
+    <Image
+      src={imgSrc}
+      alt={name}
+      width={24}
+      height={24}
+      loading="lazy"
+      onError={() => setImgSrc('/icons/token.png')}
+    />
+  );
+};
+
 
 export default function TopGainers() {
   const [topGainers, setTopGainers] = useState([]);
@@ -65,17 +84,13 @@ export default function TopGainers() {
               topGainers.map((crypto) => (
                 <tr key={crypto.id}>
                   <td className="text-light">
-                    <img
-                      src={`/icons/${crypto.symbol.toLowerCase()}.png`}
-                      alt={crypto.name}
-                      width="24"
-                      height="24"
-                      onError={(e) => {
-                        e.target.style.display = "none";
-                      }}
-                      style={{ marginRight: "0.5rem" }}
-                    />
-                    {crypto.name}
+                  <Link
+                  className="text-decoration-none link-light"
+                  href={`/coin/${crypto.id}`}
+                >
+                  <CoinIcon symbol={crypto.symbol} name={crypto.name} />{" "}
+                  {crypto.name}
+                </Link>
                   </td>
                   <td
                     className={

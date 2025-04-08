@@ -9,6 +9,27 @@ import BuyCoinModal from "@/components/BuyCoinModal";
 import { useUser } from "@/context/UserContext";
 import Link from "next/link";
 
+//fallback icon component
+const CoinIcon = ({ symbol, name, size = 50 }) => {
+  const [imgSrc, setImgSrc] = useState(`/icons/${symbol.toLowerCase()}.png`);
+
+  return (
+    <img
+      src={imgSrc}
+      alt={name}
+      width={size}
+      height={size}
+      style={{
+        width: `${size}px`,
+        height: `${size}px`,
+        marginRight: "1rem",
+        objectFit: "contain",
+      }}
+      onError={() => setImgSrc("/icons/token.png")}
+    />
+  );
+};
+
 export default function CoinDetails() {
   const params = useParams();
   const { coinId } = params;
@@ -96,13 +117,8 @@ export default function CoinDetails() {
       <div className="p-4 bg-dark rounded-2">
         <div className="d-flex flex-column flex-md-row justify-content-between mb-2 w-100">
           <div className="d-flex align-items-center">
-            {coin?.symbol && (
-              <img
-                src={`/icons/${coin.symbol.toLowerCase()}.png`}
-                alt={coin.name || "coin"}
-                style={{ width: "50px", height: "50px", marginRight: "1rem" }}
-              />
-            )}
+            {coin?.symbol && <CoinIcon symbol={coin.symbol} name={coin.name} />}
+
             <h2 className="fs-1">
               {coin.name} ({coin.symbol})
             </h2>
@@ -196,25 +212,27 @@ export default function CoinDetails() {
         </div>
       </div>
       {user ? (
-  <PriceHistoryChart
-    coinId={coinId}
-    convertValue={convertValue}
-    coin={coin}
-    symbol={symbol}
-  />
-) : (
-  <div className="p-4 mt-3 bg-dark rounded-2 text-center border border-secondary">
-   <p className="mb-0 text-muted">
-  <strong>
-    <Link href="/register" className="text-primary text-decoration-underline">
-      Login
-    </Link>{" "}
-    to see full history charts.
-  </strong>
-</p>
-  </div>
-)}
-
+        <PriceHistoryChart
+          coinId={coinId}
+          convertValue={convertValue}
+          coin={coin}
+          symbol={symbol}
+        />
+      ) : (
+        <div className="p-4 mt-3 bg-dark rounded-2 text-center border border-secondary">
+          <p className="mb-0 text-muted">
+            <strong>
+              <Link
+                href="/register"
+                className="text-primary text-decoration-underline"
+              >
+                Login
+              </Link>{" "}
+              to see full history charts.
+            </strong>
+          </p>
+        </div>
+      )}
     </div>
   );
 }
