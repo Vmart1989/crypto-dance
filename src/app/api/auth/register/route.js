@@ -15,7 +15,7 @@ export async function POST(request) {
     const { email, password, name } = await request.json();
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create a new user with the default role ("user" as defined in your schema)
+    // Create a new user with the default role ("user" as defined in schema)
     const user = await prisma.user.create({
       data: {
         email,

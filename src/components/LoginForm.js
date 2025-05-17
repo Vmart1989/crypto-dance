@@ -10,6 +10,7 @@ export default function LoginForm() {
   const [errorMsg, setErrorMsg] = useState("");
   const router = useRouter();
   const { setUser } = useUser(); // get setUser from context
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -41,9 +42,7 @@ export default function LoginForm() {
   return (
     <form onSubmit={handleSubmit}>
       <div className="mb-3">
-        <label htmlFor="email" className="form-label">
-          Email address
-        </label>
+        
         <input
           type="email"
           id="email"
@@ -54,19 +53,27 @@ export default function LoginForm() {
           required
         />
       </div>
-      <div className="mb-3">
-        <label htmlFor="password" className="form-label">
-          Password
-        </label>
+      <div className="mb-3 d-flex w-100 justify-content-between">
+     <div className="w-100">
         <input
-          type="password"
+          type={showPassword ? "text" : "password"}
           id="password"
-          className="form-control"
+          className="w-100 form-control "
           placeholder="Enter password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
         />
+       </div>
+       <div>
+        <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="form-control border-0 bg-transparent"
+            >
+              {showPassword ?  <i className="bi bi-eye-slash"></i> : <i className="bi bi-eye"></i>}
+            </button>
+      </div>      
       </div>
       {errorMsg && <p className="text-danger">{errorMsg}</p>}
       <button type="submit" className="btn btn-primary">
