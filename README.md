@@ -2,6 +2,8 @@
 
 CryptoDance is a web app that helps people learn about the cryptocurrency world through simulated trading. It offers an engaging, hands-on way to explore crypto markets without financial risk.
 
+Live on [cryptodance.app](https://www.cryptodance.app/)
+
 ## Features
 
 - **Simulated Trading:**  
