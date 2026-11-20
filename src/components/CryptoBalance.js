@@ -84,7 +84,7 @@ export default function CryptoBalance({ user, fiatSymbol }) {
 
   return (
     <div>
-      <h3>Crypto Balance</h3>
+      <div className="eyebrow mb-2">Portfolio value</div>
       <h2>
         {fiatSymbol}
         {formatCurrency(convertValue(cryptoFiatTotal))}{" "}

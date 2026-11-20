@@ -49,7 +49,13 @@ export async function POST(request) {
 
     return response;
   } catch (error) {
-    console.error("Login error:", error);
-    return NextResponse.json({ error: "Login failed" }, { status: 500 });
+    console.error(
+      "Login error:",
+      error instanceof Error ? error.message : "Unknown authentication error"
+    );
+    return NextResponse.json(
+      { error: "Login is temporarily unavailable" },
+      { status: 500 }
+    );
   }
 }

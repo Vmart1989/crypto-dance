@@ -120,10 +120,10 @@ export default function WalletTab({ refreshTrigger }) {
   };
 
   return (
-    <div className={styles.tickerContainer}>
+    <div className={`${styles.tickerContainer} dashboard-pane`}>
       <h2>Crypto Assets</h2>
 
-      <div className="mb-4 p-3 rounded dark-bg lh-1" style={{ maxWidth: "400px" }}>
+      <div className="pl-summary">
         <h4>
           Total Unrealized P/L:{" "}
           <span className={totalUnrealized >= 0 ? "text-info" : "text-danger"}>

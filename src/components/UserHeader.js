@@ -50,23 +50,21 @@ export default function UserHeader() {
   else 
 
   return (
-    <div className="d-flex align-items-baseline ">
-      <i className="bi bi-person-fill ms-3 fs-5 "></i>
-      <span className="fs-6 me-4">{user.name || user.email}</span>
+    <div className="d-flex align-items-center gap-3 user-nav">
+      <span className="d-none d-lg-inline user-name"><i className="bi bi-person-circle me-2"></i>{user.name || user.email}</span>
       <a
         onClick={handleLogout}
         style={{ cursor: "pointer" }}
-        className="fs-6 link-offset-2 link-offset-3-hover link-underline-primary link-underline-opacity-0 link-underline-opacity-75-hover me-4"
+        className="nav-action"
       >
-        <i className="bi bi-box-arrow-right fs-5 me-2"></i>
-        Log out
+        <i className="bi bi-box-arrow-right"></i><span className="d-none d-md-inline"> Log out</span>
       </a>
 
       <Link
-        className="fs-6 link-offset-2 me-4 link-offset-3-hover link-underline-primary link-underline-opacity-0 link-underline-opacity-75-hover"
+        className="nav-action"
         href="/dashboard/news"
       >
-        <i className="bi bi-newspaper fs-5 me-2 link-primary "></i>News
+        <i className="bi bi-newspaper me-1"></i> News
       </Link>
     </div>
   );

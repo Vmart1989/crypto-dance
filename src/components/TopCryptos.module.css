@@ -4,27 +4,12 @@
 
 .tickerContainer {
     width: 100%;
-    overflow: hidden;
-    height: 100vh;
-    font-size: 18px;
+    max-height: 760px;
+    font-size: 16px;
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-color: #671ae4 #671ae441;
     scrollbar-width: thin;
-    background-color: #040111; 
-    padding: 1rem;
-    
+    background: transparent;
   }
-
-
-
-  
-  
-
-  
-  
-  
- 
-
-
   

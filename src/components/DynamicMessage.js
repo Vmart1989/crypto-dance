@@ -35,9 +35,9 @@ export default function DynamicMessage() {
         : 0;
 
     return (
-      <div className="d-flex justify-content-between w-100 flex-wrap">
-        <div className="ms-2">
-          <h3 >Fiat Balance</h3>
+      <div className="premium-panel portfolio-summary w-100">
+        <div>
+          <div className="eyebrow mb-2">Available cash</div>
           <h2>
             {symbol}
             {Number(fiatBalance * rate).toLocaleString(
@@ -46,8 +46,8 @@ export default function DynamicMessage() {
             )} 
           </h2>
         </div>
-        <div className="me-2">
-          <CryptoBalance user={user} symbol={symbol} />
+        <div>
+          <CryptoBalance user={user} fiatSymbol={symbol} />
         </div>
       </div>
     );
@@ -92,5 +92,5 @@ export default function DynamicMessage() {
   }
 
 
-  return <h2>Dive into the Crypto World without risks!</h2>;
+  return null;
 }

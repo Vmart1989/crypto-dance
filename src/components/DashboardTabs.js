@@ -20,7 +20,7 @@ export default function DashboardTabs() {
   };
 
   return (
-    <div className="container">
+    <div>
       <Tabs
         activeKey={key}
         onSelect={handleTabSelect}
