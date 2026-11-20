@@ -30,6 +30,7 @@ const CoinIcon = ({ symbol, name }) => {
 export default function CryptoTicker() {
   const [cryptos, setCryptos] = useState([]);
   const [cryptosLoading, setCryptosLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const { currency } = useCurrency();
   const { rate, loading: conversionLoading } = useConversionRate(currency);
   const [search, setSearch] = useState("");
@@ -42,11 +43,15 @@ export default function CryptoTicker() {
   useEffect(() => {
     async function fetchCryptos() {
       try {
+        setLoadError(false);
         const res = await fetch("/api/cryptos");
+        if (!res.ok) throw new Error("Market data is temporarily unavailable");
         const json = await res.json();
+        if (!Array.isArray(json.data)) throw new Error("Market data is temporarily unavailable");
         setCryptos(json.data);
       } catch (error) {
         console.error("Error fetching crypto data:", error);
+        setLoadError(true);
       } finally {
         setCryptosLoading(false);
       }
@@ -95,17 +100,17 @@ export default function CryptoTicker() {
   const isLoading = cryptosLoading;
 
   return (
-    <div className={styles.tickerContainer}>
+    <div className={`${styles.tickerContainer} ticker-shell`}>
       {/* Search Bar */}
-      <div className="mb-3">
-        <div className="input-group sticky-top">
+      <div className="market-search">
+        <div className="input-group">
           <span className="input-group-text border-0 bg-transparent">
             <i className="bi bi-search text-primary"></i>
           </span>
           <input
             type="text"
             className="form-control border-0"
-            placeholder="Search top coins..."
+            placeholder="Search assets"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -118,13 +123,13 @@ export default function CryptoTicker() {
         </div>
       )}
 
-      <table className="w-100">
+      <table className="w-100 market-table">
         <thead className="sticky-top">
           <tr>
-            <th className="p-1 pb-3 "></th>
-            <th className="p-1 pb-3 "></th>
+            <th></th>
+            <th>Asset</th>
             <th
-              className="d-none d-md-table-cell p-1 pb-3 bg-for-th"
+              className="d-none d-md-table-cell"
               onClick={() => handleSort("marketCapUsd")}
               style={{
                 cursor: search.trim() === "" ? "pointer" : "not-allowed",
@@ -133,7 +138,7 @@ export default function CryptoTicker() {
               Market Cap{renderSortArrow("marketCapUsd")}
             </th>
             <th
-              className="p-1 pb-3 bg-for-th"
+              className=""
               onClick={() => handleSort("priceUsd")}
               style={{
                 cursor: search.trim() === "" ? "pointer" : "not-allowed",
@@ -141,18 +146,24 @@ export default function CryptoTicker() {
             >
               Price{renderSortArrow("priceUsd")}
             </th>
-            <th className="p-1 pb-3 bg-for-th">24h Change</th>
+            <th>24h</th>
           </tr>
         </thead>
         <tbody>
+          {!isLoading && loadError && (
+            <tr><td colSpan="5" className="market-state"><i className="bi bi-cloud-slash" /> Market data is taking a break. Please try again shortly.</td></tr>
+          )}
+          {!isLoading && !loadError && displayCryptos.length === 0 && (
+            <tr><td colSpan="5" className="market-state">{search.trim() ? "No assets match your search." : "No market data available."}</td></tr>
+          )}
           {displayCryptos.map((crypto) => (
             <tr key={crypto.id}>
-              <td className="ps-2 pb-2 text-primary">
+              <td className="text-primary">
                 {pathname === "/dashboard" ? (
                   <BuyCoinModal
                     coin={crypto}
                     convertValue={convertValue}
-                    symbol={fiatSymbol}
+                    fiatSymbol={fiatSymbol}
                     coinId={crypto.id}
                     image={`/icons/${crypto.symbol.toLowerCase()}.png`}
                   />
@@ -160,7 +171,7 @@ export default function CryptoTicker() {
                   crypto.rank
                 )}
               </td>
-              <td className="pb-2">
+              <td>
                 <Link
                   className="text-decoration-none link-light"
                   href={`/coin/${crypto.id}`}
@@ -169,19 +180,19 @@ export default function CryptoTicker() {
                   {crypto.name}
                 </Link>
               </td>
-              <td className="d-none d-md-table-cell pb-2">
+              <td className="d-none d-md-table-cell text-secondary">
                 {fiatSymbol}
                 {formatLargeNumber(convertValue(crypto.marketCapUsd))}
               </td>
-              <td className="pe-4 pb-2">
+              <td>
                 {fiatSymbol}
                 {formatSuboneNumber(convertValue(crypto.priceUsd))}
               </td>
               <td
                 className={
                   Number(crypto.changePercent24Hr) > 0
-                    ? "text-info pb-2"
-                    : "text-danger pb-2"
+                    ? "text-info"
+                    : "text-danger"
                 }
               >
                 {Number(crypto.changePercent24Hr).toFixed(2)}%

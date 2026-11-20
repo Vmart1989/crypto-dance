@@ -22,10 +22,16 @@ export default function LoginForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-      const data = await res.json();
+      const contentType = res.headers.get("content-type") || "";
+      const data = contentType.includes("application/json")
+        ? await res.json()
+        : {};
 
       if (!res.ok) {
-        setErrorMsg(data.error || "Login failed");
+        setErrorMsg(
+          data.error ||
+            "Login is temporarily unavailable. Please check the database connection."
+        );
       } else {
         // Update the user context with returned user info
         setUser(data.user);
@@ -53,30 +59,27 @@ export default function LoginForm() {
           required
         />
       </div>
-      <div className="mb-3 d-flex w-100 justify-content-between">
-     <div className="w-100">
+      <div className="mb-3 password-field">
         <input
           type={showPassword ? "text" : "password"}
           id="password"
-          className="w-100 form-control "
+          className="w-100 form-control"
           placeholder="Enter password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-       </div>
-       <div>
         <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="form-control border-0 bg-transparent"
+              className="password-toggle"
+              aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ?  <i className="bi bi-eye-slash"></i> : <i className="bi bi-eye"></i>}
             </button>
-      </div>      
       </div>
       {errorMsg && <p className="text-danger">{errorMsg}</p>}
-      <button type="submit" className="btn btn-primary">
+      <button type="submit" className="btn btn-primary w-100">
         Log In
       </button>
     </form>

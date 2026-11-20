@@ -37,9 +37,9 @@ export default function CryptoNewsPage() {
   }, []);
 
   return (
-    <div className="container mt-5">
+    <main className="container mt-4">
       <div className="d-flex justify-content-between">
-        <h2>Latest Crypto News</h2>
+        <div><div className="eyebrow mb-2">Market intelligence</div><h2>Latest crypto news</h2></div>
         
           
           <Link href="/dashboard"><i className="bi bi-arrow-left fs-5 me-2"></i>Back to dashboard</Link>
@@ -59,7 +59,7 @@ export default function CryptoNewsPage() {
       <div className="row">
         {articles.map((article, index) => (
           <div key={index} className="col-12 col-md-6 mb-3">
-            <div className="card bg-dark text-light">
+            <div className="card bg-dark text-light h-100">
               <div className="card-body">
                 {article.image_url && (
                   <img
@@ -117,6 +117,6 @@ export default function CryptoNewsPage() {
           </div>
         ))}
       </div>
-    </div>
+    </main>
   );
 }

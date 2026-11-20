@@ -41,10 +41,14 @@ export default function RegisterForm() {
   };
 
   return (
-    <div>
-      <main className="container mt-5 mb-5">
-    <div className="row justify-content-center">
-      <div className="order-2 col-11 col-md-3 border border-primary rounded m-5 p-3">
+    <main className="container py-4 py-lg-5">
+      <div className="text-center mx-auto mb-5" style={{ maxWidth: "650px" }}>
+        <div className="eyebrow justify-content-center mb-3">Build your strategy</div>
+        <h1 className="mb-3" style={{ fontSize: "clamp(2.5rem, 6vw, 4.5rem)" }}>Trade boldly.<br /><span className="text-gradient">Risk nothing.</span></h1>
+        <p className="hero-copy mx-auto">Create your free account and start with a virtual balance designed for learning, testing, and improving.</p>
+      </div>
+    <div className="row justify-content-center g-0 register-grid">
+      <div className="order-2 order-md-1 col-11 col-md-4 premium-panel login-panel">
         {user ? (
           // If the user is logged in, show a welcome message and a button to go to the dashboard
           <>
@@ -60,13 +64,16 @@ export default function RegisterForm() {
           // Otherwise, show the login form and a link to register
           <>
             <h3>Already have an account?</h3>
+            <p className="panel-kicker">Sign in and pick up where you left off.</p>
             <LoginForm />
           </>
         )}
       </div>
 
-      <div className="col-11 col-md-7 border border-primary rounded p-3 my-5">
-        <h3>Register Now For Full Access</h3>
+      <div className="order-1 order-md-2 col-11 col-md-7 premium-panel login-panel">
+        <div className="eyebrow mb-3">Free account</div>
+        <h3>Create your trading profile</h3>
+        <p className="panel-kicker">No card, no deposit, no real-world exposure.</p>
         <form onSubmit={handleRegister}>
           <div className="mb-3">
             <input
@@ -92,9 +99,7 @@ export default function RegisterForm() {
               aria-label="Email"
             />
           </div>
-          <div className="mb-3">
-            <div className="d-flex w-100 justify-content-between">
-            <div className="w-100">
+          <div className="mb-3 password-field">
             <input
               className="w-100 form-control"
               type={showPassword ? "text" : "password"} // Toggle input type based on state
@@ -106,17 +111,14 @@ export default function RegisterForm() {
               aria-label="Password"
               autoComplete="new-password"
             />
-            </div>
-            <div>
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="form-control border-0 bg-transparent"
+              className="password-toggle"
+              aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ?  <i className="bi bi-eye-slash"></i> : <i className="bi bi-eye"></i>}
             </button>
-            </div>
-            </div>
           </div>
           {errorMsg && <p className="text-danger">{errorMsg}</p>}
           <button type="submit" className="btn btn-primary w-100">
@@ -126,6 +128,5 @@ export default function RegisterForm() {
       </div>
     </div>
     </main>
-    </div>
   );
 }

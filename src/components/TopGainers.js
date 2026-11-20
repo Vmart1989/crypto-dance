@@ -25,15 +25,19 @@ const CoinIcon = ({ symbol, name }) => {
 export default function TopGainers() {
   const [topGainers, setTopGainers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState(false);
 
   useEffect(() => {
     async function fetchCryptos() {
       setLoading(true);
       try {
+        setLoadError(false);
         const res = await fetch("/api/cryptos");
+        if (!res.ok) throw new Error("Unable to load market movers");
         const json = await res.json();
         // Ensure data is an array before filtering
         const data = Array.isArray(json.data) ? json.data : [];
+        if (!Array.isArray(json.data)) throw new Error("Unable to load market movers");
 
         // Filter out cryptos with a positive 24h percentage gain
         const positiveGainers = data.filter(
@@ -52,6 +56,7 @@ export default function TopGainers() {
         setTopGainers(top5);
       } catch (error) {
         console.error("Error fetching crypto data:", error);
+        setLoadError(true);
       }
       setLoading(false);
     }
@@ -67,17 +72,13 @@ export default function TopGainers() {
         </div>
       ) : (
         <table className="table table-borderless">
-          <thead>
-            <tr>
-              <th></th>
-              <th className="text-light">24h Change</th>
-            </tr>
-          </thead>
           <tbody>
-            {topGainers.length === 0 ? (
+            {loadError ? (
+              <tr><td colSpan="2" className="market-state compact"><i className="bi bi-cloud-slash" /> Movers unavailable</td></tr>
+            ) : topGainers.length === 0 ? (
               <tr>
-                <td colSpan="2" className="text-light">
-                  Market looks disappointing today...
+                <td colSpan="2" className="market-state compact">
+                  No positive movers right now.
                 </td>
               </tr>
             ) : (

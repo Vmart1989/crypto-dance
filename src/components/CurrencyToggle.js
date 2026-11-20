@@ -15,9 +15,10 @@ export default function CurrencyToggle() {
 
       <select
         id="currencySelect"
+        aria-label="Display currency"
         value={currency}
         onChange={handleChange}
-        className="form-select form-select-sm"
+        className="form-select form-select-sm currency-select"
         style={{ width: "auto" }}
       >
         <option value="USD">USD</option>

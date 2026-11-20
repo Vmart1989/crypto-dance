@@ -6,7 +6,6 @@ import { useCurrency } from "@/context/CurrencyContext";
 import { useConversionRate } from "@/hooks/useConversionRate";
 import { useState, useEffect } from "react";
 import SellCoinModal from "./SellCoinModal";
-import CryptoBalance from "./CryptoBalance";
 
 // Fallback-safe coin icon component
 const CoinIcon = ({ symbol, name, size = 30 }) => {
@@ -118,7 +117,7 @@ export default function SellAssets() {
   });
 
   return (
-    <div className={styles.tickerContainer}>
+    <div className={`${styles.tickerContainer} dashboard-pane`}>
       <h2>Crypto Available to Cash Out</h2>
       {sortedRows.length > 0 ? (
         <table className="w-100">
@@ -201,9 +200,6 @@ export default function SellAssets() {
         <p>You don't own any crypto assets yet.</p>
       )}
 
-      <h3 className="mt-5">
-        <CryptoBalance user={user} fiatSymbol={symbol} />
-      </h3>
     </div>
   );
 }

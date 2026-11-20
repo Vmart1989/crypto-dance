@@ -53,7 +53,7 @@ function DashboardContent() {
   };
 
   return (
-    <div className="container mt-2">
+    <main className="container mt-3">
       {showMessage && message && (
         <div className="alert alert-info alert-dismissible" role="alert">
           {message}
@@ -65,14 +65,20 @@ function DashboardContent() {
           ></button>
         </div>
       )}
-      <AddFundsButton />
+      <div className="d-flex align-items-center justify-content-between mb-3">
+        <div>
+          <div className="eyebrow mb-2">Trading simulator</div>
+          <h2 className="mb-0">Your trading desk</h2>
+        </div>
+        <AddFundsButton />
+      </div>
       <div className="d-flex col justify-content-between mt-4">
         <div className="w-100">
           <DashboardTabs />
         </div>
       </div>
       {/* Additional dashboard content can go here */}
-    </div>
+    </main>
   );
 }
 
