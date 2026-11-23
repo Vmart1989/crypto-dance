@@ -18,7 +18,7 @@ export async function sendVerificationEmail({ email, token }) {
   if (process.env.NODE_ENV !== "production") return;
 
   const { host, port, user, password, from } = getSmtpConfig();
-  const appUrl = (process.env.APP_URL || "https://cryptodance.app").replace(
+  const appUrl = (process.env.APP_URL || "https://www.cryptodance.app").replace(
     /\/$/,
     ""
   );

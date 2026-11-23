@@ -36,7 +36,7 @@ export async function generateMetadata() {
   const privatePage = pathname.startsWith("/dashboard") || pathname.startsWith("/admin");
 
   return {
-    metadataBase: new URL("https://cryptodance.app"),
+    metadataBase: new URL("https://www.cryptodance.app"),
     title: { default: `${title} | CryptoDance`, template: "%s | CryptoDance" },
     description,
     keywords: ["cryptocurrency trading simulator", "crypto market", "bitcoin simulator", "virtual crypto portfolio", "learn cryptocurrency"],

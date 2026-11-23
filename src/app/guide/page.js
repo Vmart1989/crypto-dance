@@ -18,9 +18,9 @@ export default function GuidePage() {
         "@type": "WebPage",
         name: content.metaTitle,
         description: content.metaDescription,
-        url: `https://cryptodance.app${href("/guide")}`,
+        url: `https://www.cryptodance.app${href("/guide")}`,
         inLanguage: locale,
-        isPartOf: { "@type": "WebSite", name: "CryptoDance", url: "https://cryptodance.app" },
+        isPartOf: { "@type": "WebSite", name: "CryptoDance", url: "https://www.cryptodance.app" },
       },
       {
         "@type": "FAQPage",

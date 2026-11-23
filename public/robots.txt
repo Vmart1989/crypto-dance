@@ -6,7 +6,7 @@ Disallow: /dashboard
 Disallow: /api
 
 # Host
-Host: https://cryptodance.app
+Host: https://www.cryptodance.app
 
 # Sitemaps
-Sitemap: https://cryptodance.app/sitemap.xml
+Sitemap: https://www.cryptodance.app/sitemap.xml

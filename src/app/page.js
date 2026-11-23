@@ -16,7 +16,7 @@ export default function Home() {
   const structuredData = [
     {
       "@context": "https://schema.org", "@type": "WebApplication", name: "CryptoDance",
-      url: `https://cryptodance.app${href("/") === "/" ? "" : href("/")}`,
+      url: `https://www.cryptodance.app${href("/") === "/" ? "" : href("/")}`,
       description: t("meta.description"), applicationCategory: "EducationalApplication",
       operatingSystem: "Web", inLanguage: locale, offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
     },

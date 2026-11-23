@@ -1,5 +1,5 @@
 /** @type {import('next-sitemap').IConfig} */
-const siteUrl = "https://cryptodance.app";
+const siteUrl = "https://www.cryptodance.app";
 const locales = ["en", "es", "fr", "de"];
 const coins = [
   "bitcoin", "ethereum", "tether", "solana", "xrp", "binance-coin",
