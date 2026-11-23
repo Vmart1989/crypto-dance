@@ -50,7 +50,7 @@ export async function POST(request) {
           prisma.emailVerificationToken.deleteMany({ where: { userId: existing.id } }),
           prisma.emailVerificationToken.create({ data: { userId: existing.id, tokenHash: verification.tokenHash, expiresAt: verification.expiresAt } }),
         ]);
-        await sendVerificationEmail({ email: existing.email, token: verification.token });
+        await sendVerificationEmail({ email: existing.email, name: existing.name, token: verification.token });
       }
       return NextResponse.json({ message: genericMessage, requiresVerification: true }, { status: 202 });
     }
@@ -69,7 +69,7 @@ export async function POST(request) {
     if (!autoVerify) {
       const verification = createVerificationToken();
       await prisma.emailVerificationToken.create({ data: { userId: user.id, tokenHash: verification.tokenHash, expiresAt: verification.expiresAt } });
-      await sendVerificationEmail({ email: user.email, token: verification.token });
+      await sendVerificationEmail({ email: user.email, name: user.name, token: verification.token });
       return NextResponse.json({ message: genericMessage, requiresVerification: true }, { status: 202 });
     }
 

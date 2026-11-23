@@ -1,5 +1,109 @@
 import nodemailer from "nodemailer";
 
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function cleanDisplayName(value) {
+  const name = typeof value === "string" ? value.replace(/[\r\n]+/g, " ").trim() : "";
+  return name || "there";
+}
+
+function createVerificationEmail({ name, verifyUrl, logoUrl, websiteUrl }) {
+  const displayName = cleanDisplayName(name);
+  const safeName = escapeHtml(displayName);
+  const safeVerifyUrl = escapeHtml(verifyUrl);
+  const safeLogoUrl = escapeHtml(logoUrl);
+  const safeWebsiteUrl = escapeHtml(websiteUrl);
+
+  return {
+    subject: "Confirm your CryptoDance email address",
+    text: [
+      `Hi ${displayName},`,
+      "",
+      "Welcome to CryptoDance. Confirm your email address to activate your account and start practising with the crypto trading simulator.",
+      "",
+      "Verify your email:",
+      verifyUrl,
+      "",
+      "This secure link expires in 24 hours. If you did not create a CryptoDance account, you can safely ignore this email.",
+      "",
+      "CryptoDance",
+      "Practice crypto trading without real financial exposure.",
+      websiteUrl,
+    ].join("\n"),
+    html: `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Confirm your CryptoDance email address</title>
+  </head>
+  <body style="margin:0;padding:0;background-color:#f5f3ff;color:#19152b;font-family:Arial,Helvetica,sans-serif;">
+    <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">Confirm your email to activate your CryptoDance account. This link expires in 24 hours.</div>
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;background-color:#f5f3ff;">
+      <tr>
+        <td align="center" style="padding:32px 16px;">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;max-width:600px;background-color:#ffffff;border:1px solid #e6e0ff;border-radius:20px;overflow:hidden;">
+            <tr>
+              <td style="height:6px;background-color:#6d28d9;font-size:0;line-height:0;">&nbsp;</td>
+            </tr>
+            <tr>
+              <td style="padding:30px 36px 18px;">
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+                  <tr>
+                    <td style="vertical-align:middle;padding-right:12px;">
+                      <img src="${safeLogoUrl}" width="46" height="46" alt="CryptoDance" style="display:block;width:46px;height:46px;border:0;border-radius:12px;">
+                    </td>
+                    <td style="vertical-align:middle;font-size:22px;line-height:28px;font-weight:700;letter-spacing:-0.5px;color:#19152b;">Crypto<span style="color:#6d28d9;">Dance</span></td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:10px 36px 36px;">
+                <p style="margin:0 0 12px;font-size:16px;line-height:25px;color:#504a68;">Hi ${safeName},</p>
+                <h1 style="margin:0 0 16px;font-size:30px;line-height:38px;letter-spacing:-0.8px;color:#19152b;">Confirm your email address</h1>
+                <p style="margin:0 0 26px;font-size:16px;line-height:25px;color:#504a68;">Welcome to CryptoDance. Confirm your email to activate your account and start practising with the crypto trading simulator.</p>
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:0 0 26px;">
+                  <tr>
+                    <td bgcolor="#6d28d9" style="border-radius:10px;">
+                      <a href="${safeVerifyUrl}" style="display:inline-block;padding:14px 24px;font-size:16px;line-height:20px;font-weight:700;color:#ffffff;text-decoration:none;border-radius:10px;">Verify email address</a>
+                    </td>
+                  </tr>
+                </table>
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;background-color:#f7f5ff;border:1px solid #e8e3ff;border-radius:12px;">
+                  <tr>
+                    <td style="padding:16px 18px;font-size:14px;line-height:21px;color:#5d5673;">
+                      <strong style="color:#302a46;">This link expires in 24 hours.</strong><br>
+                      If you did not create a CryptoDance account, you can safely ignore this email.
+                    </td>
+                  </tr>
+                </table>
+                <p style="margin:24px 0 8px;font-size:13px;line-height:20px;color:#756e89;">If the button does not work, copy and paste this address into your browser:</p>
+                <p style="margin:0;font-size:13px;line-height:20px;word-break:break-all;"><a href="${safeVerifyUrl}" style="color:#6d28d9;text-decoration:underline;">${safeVerifyUrl}</a></p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:22px 36px;background-color:#faf9ff;border-top:1px solid #ece8f8;font-size:12px;line-height:19px;color:#756e89;">
+                CryptoDance is an educational trading simulator. No real crypto assets are purchased.<br>
+                <a href="${safeWebsiteUrl}" style="color:#6d28d9;text-decoration:none;">${safeWebsiteUrl}</a>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>`,
+  };
+}
+
 function getSmtpConfig() {
   const host = process.env.SMTP_HOST || "smtp.mail.ovh.net";
   const port = Number(process.env.SMTP_PORT || 465);
@@ -14,7 +118,7 @@ function getSmtpConfig() {
   return { host, port, user, password, from };
 }
 
-export async function sendVerificationEmail({ email, token }) {
+export async function sendVerificationEmail({ email, name, token }) {
   if (process.env.NODE_ENV !== "production") return;
 
   const { host, port, user, password, from } = getSmtpConfig();
@@ -24,6 +128,13 @@ export async function sendVerificationEmail({ email, token }) {
   );
   const verifyUrl = new URL("/api/auth/verify-email", appUrl);
   verifyUrl.searchParams.set("token", token);
+  const logoUrl = new URL("/logo.png", appUrl).toString();
+  const message = createVerificationEmail({
+    name,
+    verifyUrl: verifyUrl.toString(),
+    logoUrl,
+    websiteUrl: appUrl,
+  });
 
   const transporter = nodemailer.createTransport({
     host,
@@ -42,9 +153,10 @@ export async function sendVerificationEmail({ email, token }) {
     await transporter.sendMail({
       from,
       to: email,
-      subject: "Verify your CryptoDance account",
-      text: `Verify your CryptoDance account: ${verifyUrl.toString()}\n\nThis link expires in 24 hours.`,
-      html: `<p>Welcome to CryptoDance.</p><p><a href="${verifyUrl.toString()}">Verify your account</a></p><p>This link expires in 24 hours.</p>`,
+      replyTo: user,
+      subject: message.subject,
+      text: message.text,
+      html: message.html,
     });
   } catch (error) {
     const code =
