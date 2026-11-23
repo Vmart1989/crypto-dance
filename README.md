@@ -49,15 +49,15 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 - **Next.js:**  
   Also used for backend API routes.
-- **MySQL:**  
+- **PostgreSQL:**
   For database management.
 - **Prisma:**  
   For interacting with the MySQL database in a type-safe way.
 
 ### Security & Token Management
 
-- **JWT (using jose):**  
-  For secure token-based authentication.
+- **Revocable server-side sessions:**
+  Opaque, HTTP-only session cookies backed by PostgreSQL.
 - **bcryptjs:**  
   For hashing and securing user passwords.
 
@@ -76,6 +76,12 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
   Aggregates the latest news about cryptocurrencies.
 
 ## Getting Started
+
+Copy `.env.example` to `.env.local` and configure the required values. Production
+registration sends verification messages through OVH SMTP and requires
+`SMTP_USER`, `SMTP_PASSWORD`, `AUTH_EMAIL_FROM`, and `APP_URL`. The defaults in
+`.env.example` use OVH's SSL/TLS SMTP endpoint on port 465. Keep the mailbox
+password in local or hosting environment variables only; never commit it.
 
 First, run the development server:
 

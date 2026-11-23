@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import { useUser } from "@/context/UserContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function AddFundsModal() {
+  const { t } = useLanguage();
   const { setUser } = useUser();
   const [amount, setAmount] = useState("");
   const [feedback, setFeedback] = useState("");
@@ -49,7 +51,7 @@ export default function AddFundsModal() {
   return (
     <>
       <button className="btn btn-primary ms-2" onClick={handleOpen}>
-        Add Funds
+        {t("dashboard.addFunds")}
       </button>
 
       {showModal && (
@@ -58,7 +60,7 @@ export default function AddFundsModal() {
             <div className="modal-dialog ">
               <div className="modal-content bg-dark">
                 <div className="modal-header">
-                  <h5 className="modal-title">Add Funds</h5>
+                  <h5 className="modal-title">{t("dashboard.addFunds")}</h5>
                   <button
                     type="button"
                     className="btn-close btn-close-white"
@@ -98,7 +100,7 @@ export default function AddFundsModal() {
                     className="btn btn-primary"
                     onClick={handleSubmit}
                   >
-                    Add Funds
+                    {t("dashboard.addFunds")}
                   </button>
                 </div>
               </div>

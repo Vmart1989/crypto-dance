@@ -5,12 +5,14 @@ import { useUser } from "@/context/UserContext";
 import { useSearchParams } from "next/navigation";
 import DashboardTabs from "@/components/DashboardTabs";
 import AddFundsButton from "@/components/AddFundsModal";
+import { useLanguage } from "@/context/LanguageContext";
 
 function DashboardContent() {
   const searchParams = useSearchParams();
   const message = searchParams.get("message");
   const { user, setUser } = useUser();
   const [showMessage, setShowMessage] = useState(!!message);
+  const { t } = useLanguage();
 
   useEffect(() => {
     async function refreshUser() {
@@ -65,10 +67,10 @@ function DashboardContent() {
           ></button>
         </div>
       )}
-      <div className="d-flex align-items-center justify-content-between mb-3">
+      <div className="d-flex flex-wrap gap-3 align-items-center justify-content-between mb-3">
         <div>
-          <div className="eyebrow mb-2">Trading simulator</div>
-          <h2 className="mb-0">Your trading desk</h2>
+          <div className="eyebrow mb-2">{t("dashboard.simulator")}</div>
+          <h2 className="mb-0">{t("dashboard.desk")}</h2>
         </div>
         <AddFundsButton />
       </div>
@@ -84,7 +86,7 @@ function DashboardContent() {
 
 export default function Dashboard() {
   return (
-    <Suspense fallback={<div>Loading Dashboard...</div>}>
+    <Suspense fallback={<div>Loading...</div>}>
       <DashboardContent />
     </Suspense>
   );

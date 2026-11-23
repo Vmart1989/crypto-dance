@@ -10,32 +10,70 @@ generator client {
 }
 
 model User {
-  id           Int            @id @default(autoincrement())
-  email        String         @unique
-  password     String
-  name         String?
-  role         String         @default("user") // "user" or "admin"
-  createdAt    DateTime       @default(now())
-  wallet       Wallet?
-  transactions Transaction[]
-  cryptoAssets CryptoAsset[]
+  id                 Int                      @id @default(autoincrement())
+  email              String                   @unique
+  password           String
+  name               String?
+  role               String                   @default("user") // "user" or "admin"
+  createdAt          DateTime                 @default(now())
+  emailVerifiedAt    DateTime?
+  wallet             Wallet?
+  transactions       Transaction[]
+  cryptoAssets       CryptoAsset[]
+  sessions           Session[]
+  verificationTokens EmailVerificationToken[]
+}
+
+model Session {
+  id        String    @id @default(cuid())
+  tokenHash String    @unique
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+  expiresAt DateTime
+  revokedAt DateTime?
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model EmailVerificationToken {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model AuthThrottle {
+  key          String    @id
+  attempts     Int       @default(0)
+  resetAt      DateTime
+  blockedUntil DateTime?
+  updatedAt    DateTime  @updatedAt
+
+  @@index([resetAt])
 }
 
 model Wallet {
-  id          Int     @id @default(autoincrement())
-  fiatBalance Float   @default(0.0)
-  user        User    @relation(fields: [userId], references: [id])
-  userId      Int     @unique
+  id          Int   @id @default(autoincrement())
+  fiatBalance Float @default(0.0)
+  user        User  @relation(fields: [userId], references: [id])
+  userId      Int   @unique
 }
 
 model Transaction {
   id           Int      @id @default(autoincrement())
-  type         String   // e.g., "buy", "sell", "deposit", "withdrawal"
-  cryptoSymbol String?  // The crypto involved (if applicable)
+  type         String // e.g., "buy", "sell", "deposit", "withdrawal"
+  cryptoSymbol String? // The crypto involved (if applicable)
   coinId       String?
-  amount       Float    // Amount of crypto (if applicable)
-  price        Float    // Price per unit in fiat at the time of transaction
-  fiatAmount   Float    // Total fiat value of the transaction
+  amount       Float // Amount of crypto (if applicable)
+  price        Float // Price per unit in fiat at the time of transaction
+  fiatAmount   Float // Total fiat value of the transaction
   fiatCurrency String   @default("USD") // Added default value
   createdAt    DateTime @default(now())
   user         User     @relation(fields: [userId], references: [id])
@@ -43,10 +81,10 @@ model Transaction {
 }
 
 model CryptoAsset {
-  id      Int     @id @default(autoincrement())
-  symbol  String  // e.g., "BTC", "ETH", etc.
-  coinId  String  // e.g., "bitcoin", "ethereum", etc.
-  balance Float   @default(0)
-  user    User    @relation(fields: [userId], references: [id])
+  id      Int    @id @default(autoincrement())
+  symbol  String // e.g., "BTC", "ETH", etc.
+  coinId  String // e.g., "bitcoin", "ethereum", etc.
+  balance Float  @default(0)
+  user    User   @relation(fields: [userId], references: [id])
   userId  Int
 }

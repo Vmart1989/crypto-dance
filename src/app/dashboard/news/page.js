@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function CryptoNewsPage() {
+  const { t, href, locale } = useLanguage();
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
@@ -38,22 +40,22 @@ export default function CryptoNewsPage() {
 
   return (
     <main className="container mt-4">
-      <div className="d-flex justify-content-between">
-        <div><div className="eyebrow mb-2">Market intelligence</div><h2>Latest crypto news</h2></div>
+      <div className="d-flex flex-wrap gap-3 justify-content-between">
+        <div><div className="eyebrow mb-2">{t("news.eyebrow")}</div><h2>{t("news.title")}</h2></div>
         
           
-          <Link href="/dashboard"><i className="bi bi-arrow-left fs-5 me-2"></i>Back to dashboard</Link>
+          <Link href={href("/dashboard")}><i className="bi bi-arrow-left fs-5 me-2"></i>{t("news.back")}</Link>
         
       </div>
       {loading && (
         <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
+          <span className="visually-hidden">{t("dashboard.loading")}</span>
         </div>
       )}
       {errorMsg && <p className="text-danger">{errorMsg}</p>}
 
       {!loading && !errorMsg && articles.length === 0 && (
-        <p>No news articles found.</p>
+        <p>{t("news.none")}</p>
       )}
 
       <div className="row">
@@ -76,7 +78,7 @@ export default function CryptoNewsPage() {
 
                 {article.pubDate && (
                   <p className="card-subtitle mb-2 text-secondary">
-                    {new Date(article.pubDate).toLocaleString()}
+                    {new Date(article.pubDate).toLocaleString(locale)}
                   </p>
                 )}
                 <div className="d-flex justify-content-between align-items-center">
@@ -108,7 +110,7 @@ export default function CryptoNewsPage() {
                       rel="noopener noreferrer"
                       className="btn btn-primary"
                     >
-                      See full article
+                      {t("news.read")}
                     </a>
                   )}
                 </div>

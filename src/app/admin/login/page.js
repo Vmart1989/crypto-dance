@@ -24,6 +24,7 @@ export default function AdminLogin() {
       } else {
         // Check that the logged in user has the "admin" role
         if (data.user.role !== "admin") {
+          await fetch("/api/auth/logout", { method: "POST" });
           setErrorMsg("Access denied. You are not an admin.");
           return;
         }

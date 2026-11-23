@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/context/UserContext";
 import LoginForm from "@/components/LoginForm";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function RegisterForm() {
   const { user, setUser } = useUser();
@@ -11,12 +12,21 @@ export default function RegisterForm() {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
   const [showPassword, setShowPassword] = useState(false); // New state for password visibility
   const router = useRouter();
+  const { locale, t, href } = useLanguage();
+
+  useEffect(() => {
+    const verification = new URLSearchParams(window.location.search).get("verification");
+    if (verification === "success") setSuccessMsg(t("register.verified"));
+    if (verification === "expired" || verification === "invalid") setErrorMsg(t("register.verificationInvalid"));
+  }, [locale]);
 
   const handleRegister = async (e) => {
     e.preventDefault();
     setErrorMsg("");
+    setSuccessMsg("");
 
     try {
       const res = await fetch("/api/auth/register", {
@@ -27,25 +37,28 @@ export default function RegisterForm() {
       const data = await res.json();
 
       if (!res.ok) {
-        setErrorMsg(data.error || "Registration failed");
+        setErrorMsg(data.error || t("auth.loginFailed"));
+      } else if (data.requiresVerification) {
+        setSuccessMsg(t("register.verifyEmail"));
+        setPassword("");
       } else {
         // Update the user context with the returned user info
         setUser(data.user);
         console.log("Registered user:", data.user);
-        router.push("/dashboard?message=User%20registered%20successfully");
+        router.push(`${href("/dashboard")}?message=User%20registered%20successfully`);
       }
     } catch (error) {
       console.error("Registration error:", error);
-      setErrorMsg("An unexpected error occurred.");
+      setErrorMsg(t("auth.loginFailed"));
     }
   };
 
   return (
     <main className="container py-4 py-lg-5">
       <div className="text-center mx-auto mb-5" style={{ maxWidth: "650px" }}>
-        <div className="eyebrow justify-content-center mb-3">Build your strategy</div>
-        <h1 className="mb-3" style={{ fontSize: "clamp(2.5rem, 6vw, 4.5rem)" }}>Trade boldly.<br /><span className="text-gradient">Risk nothing.</span></h1>
-        <p className="hero-copy mx-auto">Create your free account and start with a virtual balance designed for learning, testing, and improving.</p>
+        <div className="eyebrow justify-content-center mb-3">{t("register.eyebrow")}</div>
+        <h1 className="mb-3" style={{ fontSize: "clamp(2.5rem, 6vw, 4.5rem)" }}>{t("register.title1")}<br /><span className="text-gradient">{t("register.title2")}</span></h1>
+        <p className="hero-copy mx-auto">{t("register.intro")}</p>
       </div>
     <div className="row justify-content-center g-0 register-grid">
       <div className="order-2 order-md-1 col-11 col-md-4 premium-panel login-panel">
@@ -55,74 +68,76 @@ export default function RegisterForm() {
             <h3 className="mb-4">Welcome back {user.name || user.email}!</h3>
             <button
               className="btn btn-primary w-100"
-              onClick={() => router.push("/dashboard")}
+              onClick={() => router.push(href("/dashboard"))}
             >
-              Go to Your Dashboard
+              {t("home.dashboard")}
             </button>
           </>
         ) : (
           // Otherwise, show the login form and a link to register
           <>
-            <h3>Already have an account?</h3>
-            <p className="panel-kicker">Sign in and pick up where you left off.</p>
+            <h3>{t("register.existing")}</h3>
+            <p className="panel-kicker">{t("register.existingCopy")}</p>
             <LoginForm />
           </>
         )}
       </div>
 
       <div className="order-1 order-md-2 col-11 col-md-7 premium-panel login-panel">
-        <div className="eyebrow mb-3">Free account</div>
-        <h3>Create your trading profile</h3>
-        <p className="panel-kicker">No card, no deposit, no real-world exposure.</p>
+        <div className="eyebrow mb-3">{t("register.free")}</div>
+        <h3>{t("register.profile")}</h3>
+        <p className="panel-kicker">{t("register.safe")}</p>
         <form onSubmit={handleRegister}>
           <div className="mb-3">
             <input
               className="w-100 form-control"
               type="text"
-              placeholder="Name"
+              placeholder={t("register.name")}
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              minLength={3}
-              maxLength={10}
-              aria-label="Name"
+              minLength={2}
+              maxLength={50}
+              aria-label={t("register.name")}
             />
           </div>
           <div className="mb-3">
             <input
               className="w-100 form-control"
               type="email"
-              placeholder="Email"
+              placeholder={t("auth.email")}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              aria-label="Email"
+              aria-label={t("auth.email")}
             />
           </div>
           <div className="mb-3 password-field">
             <input
               className="w-100 form-control"
               type={showPassword ? "text" : "password"} // Toggle input type based on state
-              placeholder="Password (min. 8 characters)"
+              placeholder={t("register.passwordHint")}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={8}
-              aria-label="Password"
+              maxLength={72}
+              aria-label={t("auth.password")}
               autoComplete="new-password"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="password-toggle"
-              aria-label={showPassword ? "Hide password" : "Show password"}
+              aria-label={showPassword ? t("auth.hidePassword") : t("auth.showPassword")}
             >
               {showPassword ?  <i className="bi bi-eye-slash"></i> : <i className="bi bi-eye"></i>}
             </button>
           </div>
           {errorMsg && <p className="text-danger">{errorMsg}</p>}
+          {successMsg && <p className="alert alert-success">{successMsg}</p>}
           <button type="submit" className="btn btn-primary w-100">
-            Register
+            {t("register.submit")}
           </button>
         </form>
       </div>

@@ -5,10 +5,12 @@ import { Tab, Tabs } from "react-bootstrap";
 import TopCryptos from "@/components/TopCryptos";
 import SellAssets from "./SellAssets";
 import WalletTab from "./WalletTab";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function DashboardTabs() {
   const [key, setKey] = useState("cryptos");
   const [refreshTrigger, setRefreshTrigger] = useState(0); // Trigger to refresh WalletTab data
+  const { t } = useLanguage();
 
   // Function to handle tab selection
   const handleTabSelect = (selectedKey) => {
@@ -28,13 +30,13 @@ export default function DashboardTabs() {
         className="custom-tabs"
         fill
       >
-        <Tab eventKey="cryptos" title="BUY" className="border-start border-bottom border-primary">
+        <Tab eventKey="cryptos" title={t("dashboard.buy")} className="border-start border-bottom border-primary">
           <TopCryptos />
         </Tab>
-        <Tab eventKey="wallet" title="SELL" className="border-start border-end border-bottom border-primary">
+        <Tab eventKey="wallet" title={t("dashboard.sell")} className="border-start border-end border-bottom border-primary">
           <SellAssets />
         </Tab>
-        <Tab eventKey="tbd" title="WALLET" className="border-start border-end border-bottom border-primary">
+        <Tab eventKey="tbd" title={t("dashboard.wallet")} className="border-start border-end border-bottom border-primary">
           {/* Pass refreshTrigger to WalletTab to trigger data refresh */}
           <WalletTab refreshTrigger={refreshTrigger} />
         </Tab>

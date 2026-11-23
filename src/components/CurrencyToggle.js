@@ -2,9 +2,11 @@
 "use client";
 
 import { useCurrency } from "../context/CurrencyContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function CurrencyToggle() {
   const { currency, setCurrency } = useCurrency(); // Access from context
+  const { t } = useLanguage();
 
   const handleChange = (e) => {
     setCurrency(e.target.value);
@@ -15,7 +17,7 @@ export default function CurrencyToggle() {
 
       <select
         id="currencySelect"
-        aria-label="Display currency"
+        aria-label={t("dashboard.desk")}
         value={currency}
         onChange={handleChange}
         className="form-select form-select-sm currency-select"

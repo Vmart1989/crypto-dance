@@ -1,185 +1,47 @@
 /** @type {import('next-sitemap').IConfig} */
+const siteUrl = "https://cryptodance.app";
+const locales = ["en", "es", "fr", "de"];
+const coins = [
+  "bitcoin", "ethereum", "tether", "solana", "xrp", "binance-coin",
+  "usd-coin", "cardano", "dogecoin", "tron", "chainlink", "avalanche",
+  "sui", "shiba-inu", "polkadot", "dai", "pepe", "official-trump",
+  "cronos-com-coin", "arbitrum", "bonk1", "floki-inu", "steth", "stellar",
+];
+
+const localizedPath = (path, locale) => {
+  const prefix = locale === "en" ? "" : `/${locale}`;
+  return path === "/" ? prefix || "/" : `${prefix}${path}`;
+};
+
+const alternates = (path) => [
+  ...locales.map((hreflang) => ({ hreflang, href: `${siteUrl}${localizedPath(path, hreflang) === "/" ? "" : localizedPath(path, hreflang)}`, hrefIsAbsolute: true })),
+  { hreflang: "x-default", href: siteUrl + (path === "/" ? "" : path), hrefIsAbsolute: true },
+];
+
+const entry = (path, locale, priority = 0.7) => ({
+  loc: localizedPath(path, locale),
+  changefreq: path.startsWith("/coin/") ? "daily" : "weekly",
+  priority,
+  lastmod: new Date().toISOString(),
+  alternateRefs: alternates(path),
+});
+
 module.exports = {
-    siteUrl: 'https://cryptodance.app', //
-    generateRobotsTxt: true, // generate robots.txt 
-    sitemapSize: 7000, 
-    exclude: ['/admin', '/admin/*', '/dashboard', '/dashboard/*'],
-
-
-    additionalPaths: async (config) => [
-        {
-          loc: `${config.siteUrl}/coin/bitcoin`,
-          lastmod: new Date().toISOString(),
-          changefreq: 'daily',
-          priority: 0.8,
-        },
-        {
-          loc: `${config.siteUrl}/coin/ethereum`,
-          lastmod: new Date().toISOString(),
-          changefreq: 'daily',
-          priority: 0.8,
-        },
-        {
-          loc: `${config.siteUrl}/coin/tether`,
-          lastmod: new Date().toISOString(),
-          changefreq: 'daily',
-          priority: 0.8,
-        },
-        {
-          loc: `${config.siteUrl}/coin/solana`,
-          lastmod: new Date().toISOString(),
-          changefreq: 'daily',
-          priority: 0.8,
-        },
-
-        {
-            loc: `${config.siteUrl}/coin/xrp`,
-            lastmod: new Date().toISOString(),
-            changefreq: 'daily',
-            priority: 0.8,
-          },
-
-        {
-          loc: `${config.siteUrl}/coin/binance-coin`,
-          lastmod: new Date().toISOString(),
-          changefreq: 'daily',
-          priority: 0.8,
-        },
-
-        {
-            loc: `${config.siteUrl}/coin/usd-coin`,
-            lastmod: new Date().toISOString(),
-            changefreq: 'daily',
-            priority: 0.8,
-          },
-
-          {
-            loc: `${config.siteUrl}/coin/cardano`,
-            lastmod: new Date().toISOString(),
-            changefreq: 'daily',
-            priority: 0.8,
-          },
-
-          {
-            loc: `${config.siteUrl}/coin/dogecoin`,
-            lastmod: new Date().toISOString(),
-            changefreq: 'daily',
-            priority: 0.8,
-          },
-
-          {
-            loc: `${config.siteUrl}/coin/tron`,
-            lastmod: new Date().toISOString(),
-            changefreq: 'daily',
-            priority: 0.8,
-          },
-
-          {
-            loc: `${config.siteUrl}/coin/chainlink`,
-            lastmod: new Date().toISOString(),
-            changefreq: 'daily',
-            priority: 0.8,
-          },
-
-          {
-            loc: `${config.siteUrl}/coin/avalanche`,
-            lastmod: new Date().toISOString(),
-            changefreq: 'daily',
-            priority: 0.8,
-          },
-
-          {
-            loc: `${config.siteUrl}/coin/sui`,
-            lastmod: new Date().toISOString(),
-            changefreq: 'daily',
-            priority: 0.8,
-          },
-
-          {
-            loc: `${config.siteUrl}/coin/shiba-inu`,
-            lastmod: new Date().toISOString(),
-            changefreq: 'daily',
-            priority: 0.8,
-          },
-
-          {
-            loc: `${config.siteUrl}/coin/polkadot`,
-            lastmod: new Date().toISOString(),
-            changefreq: 'daily',
-            priority: 0.8,
-          },
-
-          {
-            loc: `${config.siteUrl}/coin/dai`,
-            lastmod: new Date().toISOString(),
-            changefreq: 'daily',
-            priority: 0.8,
-          },
-
-          {
-            loc: `${config.siteUrl}/coin/pepe`,
-            lastmod: new Date().toISOString(),
-            changefreq: 'daily',
-            priority: 0.8,
-          },
-
-          {
-            loc: `${config.siteUrl}/coin/official-trump`,
-            lastmod: new Date().toISOString(),
-            changefreq: 'daily',
-            priority: 0.8,
-          },
-
-          {
-            loc: `${config.siteUrl}/coin/cronos-com-coin`,
-            lastmod: new Date().toISOString(),
-            changefreq: 'daily',
-            priority: 0.8,
-          },
-
-          {
-            loc: `${config.siteUrl}/coin/arbitrum`,
-            lastmod: new Date().toISOString(),
-            changefreq: 'daily',
-            priority: 0.8,
-          },
-
-          {
-            loc: `${config.siteUrl}/coin/bonk1`,
-            lastmod: new Date().toISOString(),
-            changefreq: 'daily',
-            priority: 0.8,
-          },
-
-          {
-            loc: `${config.siteUrl}/coin/floki-inu`,
-            lastmod: new Date().toISOString(),
-            changefreq: 'daily',
-            priority: 0.8,
-          },
-
-          {
-            loc: `${config.siteUrl}/coin/binance-coin`,
-            lastmod: new Date().toISOString(),
-            changefreq: 'daily',
-            priority: 0.8,
-          },
-
-          {
-            loc: `${config.siteUrl}/coin/steth`,
-            lastmod: new Date().toISOString(),
-            changefreq: 'daily',
-            priority: 0.8,
-          },
-
-          {
-            loc: `${config.siteUrl}/coin/stellar`,
-            lastmod: new Date().toISOString(),
-            changefreq: 'daily',
-            priority: 0.8,
-          },
-
-
-    ],
-  };
-  
+  siteUrl,
+  generateRobotsTxt: true,
+  exclude: ["/admin", "/admin/*", "/dashboard", "/dashboard/*", "/api/*"],
+  robotsTxtOptions: {
+    policies: [{ userAgent: "*", allow: "/", disallow: ["/admin", "/dashboard", "/api"] }],
+  },
+  additionalPaths: async () => {
+    const publicPaths = ["/", "/guide", "/register", ...coins.map((coin) => `/coin/${coin}`)];
+    return publicPaths.flatMap((path) => locales.map((locale) => entry(path, locale, path === "/" ? 1 : path === "/register" ? 0.8 : 0.7)));
+  },
+  transform: async (config, path) => ({
+    loc: path,
+    changefreq: path.startsWith("/coin/") ? "daily" : "weekly",
+    priority: path === "/" ? 1 : 0.7,
+    lastmod: new Date().toISOString(),
+    alternateRefs: alternates(path),
+  }),
+};

@@ -2,24 +2,11 @@
 export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-import { jwtVerify } from "jose";
-
-const prisma = new PrismaClient();
-const JWT_SECRET = process.env.JWT_SECRET;
-
-async function isAdmin(tokenValue) {
-  try {
-    const { payload } = await jwtVerify(tokenValue, new TextEncoder().encode(JWT_SECRET));
-    return payload.role === "admin";
-  } catch (error) {
-    return false;
-  }
-}
+import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/auth";
 
 export async function GET(request) {
-  const token = request.cookies.get("token");
-  if (!token || !token.value || !(await isAdmin(token.value))) {
+  if (!(await requireAdmin(request))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   try {

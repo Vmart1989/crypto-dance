@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import styles from "./TopGainers.module.css"; 
 import Image from "next/image";
 import Link from "next/link";
+import { useLanguage } from "@/context/LanguageContext";
 
 // Fallback image wrapper component
 const CoinIcon = ({ symbol, name }) => {
@@ -23,6 +24,7 @@ const CoinIcon = ({ symbol, name }) => {
 
 
 export default function TopGainers() {
+  const { t, href } = useLanguage();
   const [topGainers, setTopGainers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState(false);
@@ -68,17 +70,17 @@ export default function TopGainers() {
     <div className={styles.topGainersContainer}>
       {loading ? (
         <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
+          <span className="visually-hidden">{t("dashboard.loading")}</span>
         </div>
       ) : (
         <table className="table table-borderless">
           <tbody>
             {loadError ? (
-              <tr><td colSpan="2" className="market-state compact"><i className="bi bi-cloud-slash" /> Movers unavailable</td></tr>
+              <tr><td colSpan="2" className="market-state compact"><i className="bi bi-cloud-slash" /> {t("market.moversUnavailable")}</td></tr>
             ) : topGainers.length === 0 ? (
               <tr>
                 <td colSpan="2" className="market-state compact">
-                  No positive movers right now.
+                  {t("market.noMovers")}
                 </td>
               </tr>
             ) : (
@@ -87,7 +89,7 @@ export default function TopGainers() {
                   <td className="text-light">
                   <Link
                   className="text-decoration-none link-light"
-                  href={`/coin/${crypto.id}`}
+                  href={href(`/coin/${crypto.id}`)}
                 >
                   <CoinIcon symbol={crypto.symbol} name={crypto.name} />{" "}
                   {crypto.name}

@@ -3,12 +3,14 @@
 import { useState, useEffect } from "react";
 import { useCurrency } from "@/context/CurrencyContext";
 import { useConversionRate } from "@/hooks/useConversionRate";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function CryptoBalance({ user, fiatSymbol }) {
   const { currency } = useCurrency();
   const { rate } = useConversionRate(currency);
   const [cryptoFiatTotal, setCryptoFiatTotal] = useState(0);
   const [cryptoWeightedChange, setCryptoWeightedChange] = useState(0);
+  const { t } = useLanguage();
 
   // Helper: convert a value using the conversion rate
   const convertValue = (value) => Number(value) * rate;
@@ -36,12 +38,21 @@ export default function CryptoBalance({ user, fiatSymbol }) {
 
               try {
                 const res = await fetch(`/api/crypto?id=${endpoint}`);
-                const json = await res.json();
-                
+                const body = await res.text();
+                let json = null;
 
-                // If json.data is missing or empty, mark null
-                if (!json.data) {
-                  console.error(`No data for ${endpoint}`);
+                if (body) {
+                  try {
+                    json = JSON.parse(body);
+                  } catch {
+                    console.warn(`Invalid market data response for ${endpoint}`);
+                  }
+                }
+
+                if (!res.ok || !json?.data) {
+                  console.warn(
+                    `Market data unavailable for ${endpoint} (${res.status})`
+                  );
                   coinDataMap[asset.id] = null;
                 } else {
                   coinDataMap[asset.id] = json.data;
@@ -84,7 +95,7 @@ export default function CryptoBalance({ user, fiatSymbol }) {
 
   return (
     <div>
-      <div className="eyebrow mb-2">Portfolio value</div>
+      <div className="eyebrow mb-2">{t("dashboard.portfolioValue")}</div>
       <h2>
         {fiatSymbol}
         {formatCurrency(convertValue(cryptoFiatTotal))}{" "}

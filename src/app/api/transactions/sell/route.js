@@ -1,25 +1,16 @@
 export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
-import { jwtVerify } from "jose";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
-const JWT_SECRET = process.env.JWT_SECRET;
+import { prisma } from "@/lib/prisma";
+import { isSameOrigin, requireUser } from "@/lib/auth";
 
 export async function POST(request) {
-  const token = request.cookies.get("token");
-  if (!token || !token.value) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  if (!isSameOrigin(request)) return NextResponse.json({ error: "Invalid request origin" }, { status: 403 });
+  const auth = await requireUser(request);
+  if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
-    // Verify token and extract payload
-    const { payload } = await jwtVerify(
-      token.value,
-      new TextEncoder().encode(JWT_SECRET)
-    );
-    const userId = payload.userId;
+    const userId = auth.user.id;
 
     // Parse request body - note: we expect both coinId and coinSymbol
     const { coinId, coinSymbol, amount, price, fiatRevenue, fiatCurrency } = await request.json();

@@ -6,6 +6,7 @@ import { useUser } from "@/context/UserContext";
 import { useCurrency } from "@/context/CurrencyContext";
 import { useConversionRate } from "@/hooks/useConversionRate";
 import Link from "next/link";
+import { useLanguage } from "@/context/LanguageContext";
 
 function computeCoinStats(transactions) {
   const stats = {};
@@ -38,6 +39,7 @@ function computeCoinStats(transactions) {
 }
 
 export default function WalletTab({ refreshTrigger }) {
+  const { t, href } = useLanguage();
   const { user } = useUser();
   const { currency } = useCurrency();
   const { rate } = useConversionRate(currency);
@@ -121,11 +123,11 @@ export default function WalletTab({ refreshTrigger }) {
 
   return (
     <div className={`${styles.tickerContainer} dashboard-pane`}>
-      <h2>Crypto Assets</h2>
+      <h2>{t("wallet.assets")}</h2>
 
       <div className="pl-summary">
         <h4>
-          Total Unrealized P/L:{" "}
+          {t("wallet.unrealized")}:{" "}
           <span className={totalUnrealized >= 0 ? "text-info" : "text-danger"}>
             {fiatSymbol}
             {totalUnrealized >= -0.09
@@ -137,7 +139,7 @@ export default function WalletTab({ refreshTrigger }) {
 
       <div className="d-flex flex-wrap gap-3">
         {assetData.length === 0 ? (
-          <p>You do not own any crypto assets.</p>
+          <p>{t("wallet.none")}</p>
         ) : (
           assetData.map((coin) => {
             const key = coin.symbol.toLowerCase();
@@ -164,7 +166,7 @@ export default function WalletTab({ refreshTrigger }) {
                     style={{ width: "32px", height: "32px", marginRight: "0.5rem" }}
                     onError={(e) => (e.target.style.display = "none")}
                   />
-                  <Link href={`/coin/${coin.coinId}`} className="text-decoration-none link-light">
+                  <Link href={href(`/coin/${coin.coinId}`)} className="text-decoration-none link-light">
                     <h5 className="m-0">
                       {coin.name} ({coin.symbol})
                     </h5>

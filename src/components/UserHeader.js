@@ -4,31 +4,35 @@ import { useUser } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useLanguage } from "@/context/LanguageContext";
+import { stripLocale } from "@/i18n/config";
 
 export default function UserHeader() {
   const { user, setUser } = useUser();
   const router = useRouter();
   const pathname = usePathname();
+  const { t, href } = useLanguage();
+  const cleanPath = stripLocale(pathname);
 
   const handleLogout = async () => {
     // Call logout endpoint and clear user context
     await fetch("/api/auth/logout", { method: "POST" });
     setUser(null);
-    router.push("/");
+    router.push(href("/"));
   };
 
   const handleLogoutAdmin = async () => {
     // Call logout endpoint and clear user context
     await fetch("/api/auth/logout", { method: "POST" });
     setUser(null);
-    router.push("/admin/login");
+    router.push(href("/admin/login"));
   };
 
   // Only render something if the user is logged in.
-  if (!user || pathname.startsWith("/admin/login")) return null;
+  if (!user || cleanPath.startsWith("/admin/login")) return null;
   
   
-  if (pathname.startsWith("/admin/dashboard") ) {
+  if (cleanPath.startsWith("/admin/dashboard") ) {
     return (
       <div className="d-flex align-items-baseline ">
       <i className="bi bi-person-fill ms-3 fs-5 "></i>
@@ -39,7 +43,7 @@ export default function UserHeader() {
         className="fs-6 link-offset-2 link-offset-3-hover link-underline-primary link-underline-opacity-0 link-underline-opacity-75-hover me-4"
       >
         <i className="bi bi-box-arrow-right fs-5 me-2"></i>
-        Log out
+        {t("nav.logout")}
       </a>
 
       
@@ -57,14 +61,14 @@ export default function UserHeader() {
         style={{ cursor: "pointer" }}
         className="nav-action"
       >
-        <i className="bi bi-box-arrow-right"></i><span className="d-none d-md-inline"> Log out</span>
+        <i className="bi bi-box-arrow-right"></i><span className="d-none d-md-inline"> {t("nav.logout")}</span>
       </a>
 
       <Link
         className="nav-action"
-        href="/dashboard/news"
+        href={href("/dashboard/news")}
       >
-        <i className="bi bi-newspaper me-1"></i> News
+        <i className="bi bi-newspaper"></i><span className="d-none d-md-inline"> {t("nav.news")}</span>
       </Link>
     </div>
   );

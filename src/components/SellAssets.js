@@ -6,6 +6,7 @@ import { useCurrency } from "@/context/CurrencyContext";
 import { useConversionRate } from "@/hooks/useConversionRate";
 import { useState, useEffect } from "react";
 import SellCoinModal from "./SellCoinModal";
+import { useLanguage } from "@/context/LanguageContext";
 
 // Fallback-safe coin icon component
 const CoinIcon = ({ symbol, name, size = 30 }) => {
@@ -29,6 +30,7 @@ const CoinIcon = ({ symbol, name, size = 30 }) => {
 };
 
 export default function SellAssets() {
+  const { t } = useLanguage();
   const { user } = useUser();
   const { currency } = useCurrency();
   const { rate } = useConversionRate(currency);
@@ -118,16 +120,16 @@ export default function SellAssets() {
 
   return (
     <div className={`${styles.tickerContainer} dashboard-pane`}>
-      <h2>Crypto Available to Cash Out</h2>
+      <h2>{t("sell.title")}</h2>
       {sortedRows.length > 0 ? (
         <table className="w-100">
           <thead className="sticky-top">
             <tr>
               <th></th>
               <th></th>
-              <th className="fw-light">Quantity</th>
-              <th className="fw-light">Value</th>
-              <th className="fw-light d-none d-md-table-cell">24h Change</th>
+              <th className="fw-light">{t("sell.quantity")}</th>
+              <th className="fw-light">{t("sell.value")}</th>
+              <th className="fw-light d-none d-md-table-cell">{t("market.change24h")}</th>
             </tr>
           </thead>
           <tbody>
@@ -137,7 +139,7 @@ export default function SellAssets() {
                   <tr key={row.id}>
                     <td colSpan={5}>
                       <div className="spinner-border text-light" role="status">
-                        <span className="visually-hidden">Loading...</span>
+                        <span className="visually-hidden">{t("dashboard.loading")}</span>
                       </div>
                     </td>
                   </tr>
@@ -197,7 +199,7 @@ export default function SellAssets() {
           </tbody>
         </table>
       ) : (
-        <p>You don't own any crypto assets yet.</p>
+        <p>{t("sell.none")}</p>
       )}
 
     </div>

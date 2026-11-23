@@ -8,6 +8,7 @@ import PriceHistoryChart from "@/components/PriceHistoryChart";
 import BuyCoinModal from "@/components/BuyCoinModal";
 import { useUser } from "@/context/UserContext";
 import Link from "next/link";
+import { useLanguage } from "@/context/LanguageContext";
 
 //fallback icon component
 const CoinIcon = ({ symbol, name, size = 50 }) => {
@@ -40,6 +41,7 @@ export default function CoinDetails() {
   const { currency } = useCurrency();
   const { rate } = useConversionRate(currency);
   const { user } = useUser();
+  const { t, href } = useLanguage();
 
   // Fetch coin details and 7-day history
   useEffect(() => {
@@ -105,7 +107,7 @@ export default function CoinDetails() {
     return (
       <div className="container py-5 text-center">
         <div className="spinner-border text-light" role="status">
-          <span className="visually-hidden">Loading...</span>
+          <span className="visually-hidden">{t("dashboard.loading")}</span>
         </div>
       </div>
     );
@@ -114,9 +116,9 @@ export default function CoinDetails() {
     <main className="container py-5">
       <div className="premium-panel empty-state mx-auto">
         <i className="bi bi-cloud-slash"></i>
-        <h2>Coin data unavailable</h2>
-        <p>We couldn&apos;t load this asset right now. The market feed may be temporarily unavailable.</p>
-        <Link href="/" className="btn btn-outline-primary">Return home</Link>
+        <h2>{t("coin.unavailable")}</h2>
+        <p>{t("coin.unavailableCopy")}</p>
+        <Link href={href("/")} className="btn btn-outline-primary">{t("coin.home")}</Link>
       </div>
     </main>
   );
@@ -164,7 +166,7 @@ export default function CoinDetails() {
       <div className="p-4 mt-3 premium-panel coin-stats flex-column flex-md-row d-flex justify-content-between gap-3">
         <div className="fs-5">
           <strong>
-            Market Cap
+            {t("coin.marketCap")}
             <i
               className="bi bi-question-circle ms-1 tooltip-text"
               title="Price × Circulating Supply"
@@ -177,7 +179,7 @@ export default function CoinDetails() {
         </div>
         <div className="fs-5">
           <strong>
-            Volume (24h)
+            {t("coin.volume")}
             <i
               className="bi bi-question-circle ms-1 tooltip-text"
               title="Sum of all trade values in 24 hours"
@@ -190,7 +192,7 @@ export default function CoinDetails() {
         </div>
         <div className="fs-5">
           <strong>
-            Supply
+            {t("coin.supply")}
             <i
               className="bi bi-question-circle ms-1 tooltip-text"
               title="Total coins in circulation"
@@ -202,7 +204,7 @@ export default function CoinDetails() {
         </div>
         <div className="fs-5">
           <strong>
-            Yearly High
+            {t("coin.yearHigh")}
             <i
               className="bi bi-question-circle ms-1 tooltip-text"
               title="Highest price over last 365 days"
@@ -215,7 +217,7 @@ export default function CoinDetails() {
               {(100 - (coin.priceUsd / yearlyHigh) * 100).toFixed(1)}%)
             </p>
           ) : (
-            <p>Data not available</p>
+            <p>{t("coin.noData")}</p>
           )}
         </div>
       </div>
@@ -231,12 +233,11 @@ export default function CoinDetails() {
           <p className="mb-0 text-muted">
             <strong>
               <Link
-                href="/register"
+                href={href("/register")}
                 className="text-primary text-decoration-underline"
               >
-                Login
-              </Link>{" "}
-              to see full history charts.
+                {t("auth.login")}
+              </Link>{" "}{t("coin.chartLogin")}
             </strong>
           </p>
         </div>

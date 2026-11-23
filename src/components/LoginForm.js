@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "../context/UserContext"; // Import your UserContext hook
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -11,6 +12,7 @@ export default function LoginForm() {
   const router = useRouter();
   const { setUser } = useUser(); // get setUser from context
   const [showPassword, setShowPassword] = useState(false);
+  const { t } = useLanguage();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -30,7 +32,7 @@ export default function LoginForm() {
       if (!res.ok) {
         setErrorMsg(
           data.error ||
-            "Login is temporarily unavailable. Please check the database connection."
+            t("auth.loginUnavailable")
         );
       } else {
         // Update the user context with returned user info
@@ -41,7 +43,7 @@ export default function LoginForm() {
       }
     } catch (error) {
       console.error("Login error:", error);
-      setErrorMsg("An unexpected error occurred.");
+      setErrorMsg(t("auth.loginFailed"));
     }
   };
 
@@ -53,7 +55,7 @@ export default function LoginForm() {
           type="email"
           id="email"
           className="form-control"
-          placeholder="Enter email"
+          placeholder={t("auth.email")}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
@@ -64,7 +66,7 @@ export default function LoginForm() {
           type={showPassword ? "text" : "password"}
           id="password"
           className="w-100 form-control"
-          placeholder="Enter password"
+          placeholder={t("auth.password")}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
@@ -73,14 +75,14 @@ export default function LoginForm() {
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="password-toggle"
-              aria-label={showPassword ? "Hide password" : "Show password"}
+              aria-label={showPassword ? t("auth.hidePassword") : t("auth.showPassword")}
             >
               {showPassword ?  <i className="bi bi-eye-slash"></i> : <i className="bi bi-eye"></i>}
             </button>
       </div>
       {errorMsg && <p className="text-danger">{errorMsg}</p>}
       <button type="submit" className="btn btn-primary w-100">
-        Log In
+        {t("auth.login")}
       </button>
     </form>
   );

@@ -1,35 +1,22 @@
 export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-import { jwtVerify } from "jose";
-
-const prisma = new PrismaClient();
-const JWT_SECRET = process.env.JWT_SECRET;
-
-async function isAdmin(tokenValue) {
-  try {
-    const { payload } = await jwtVerify(
-      tokenValue,
-      new TextEncoder().encode(JWT_SECRET)
-    );
-    return payload.role === "admin";
-  } catch (error) {
-    return false;
-  }
-}
+import { prisma } from "@/lib/prisma";
+import { isSameOrigin, requireAdmin } from "@/lib/auth";
 
 // GET handler to fetch a single user's details
 export async function GET(request, { params }) {
-  const token = request.cookies.get("token");
-  if (!token || !token.value || !(await isAdmin(token.value))) {
+  if (!(await requireAdmin(request))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   try {
     const { id } = params;
     const user = await prisma.user.findUnique({
       where: { id: Number(id) },
-      include: { wallet: true, cryptoAssets: true, transactions: true },
+      select: {
+        id: true, email: true, name: true, role: true, createdAt: true,
+        emailVerifiedAt: true, wallet: true, cryptoAssets: true, transactions: true,
+      },
     });
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
@@ -42,18 +29,23 @@ export async function GET(request, { params }) {
 }
 
 export async function PUT(request, { params }) {
-  const token = request.cookies.get("token");
-  if (!token || !token.value || !(await isAdmin(token.value))) {
+  if (!isSameOrigin(request)) return NextResponse.json({ error: "Invalid request origin" }, { status: 403 });
+  if (!(await requireAdmin(request))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   try {
     const { id } = params;
     const { fiatBalance, role } = await request.json();
+    if (!['user', 'admin'].includes(role)) return NextResponse.json({ error: "Invalid role" }, { status: 400 });
+    if (fiatBalance !== undefined && (!Number.isFinite(Number(fiatBalance)) || Number(fiatBalance) < 0 || Number(fiatBalance) > 100000)) {
+      return NextResponse.json({ error: "Invalid fiat balance" }, { status: 400 });
+    }
 
     // Update the user's role
     const updatedUser = await prisma.user.update({
       where: { id: Number(id) },
       data: { role },
+      select: { id: true, email: true, name: true, role: true, createdAt: true, emailVerifiedAt: true },
     });
 
     // Update the wallet's fiat balance if provided
@@ -80,8 +72,8 @@ export async function DELETE(request, context) {
   const params = await Promise.resolve(context.params);
   const { id } = params;
   
-  const tokenObj = request.cookies.get("token");
-  if (!tokenObj || !tokenObj.value || !(await isAdmin(tokenObj.value))) {
+  if (!isSameOrigin(request)) return NextResponse.json({ error: "Invalid request origin" }, { status: 403 });
+  if (!(await requireAdmin(request))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   
@@ -95,10 +87,7 @@ export async function DELETE(request, context) {
     ]);
     return NextResponse.json({ message: "User deleted" });
   } catch (error) {
-    console.error("Error deleting user:", error.message);
-    return NextResponse.json(
-      { error: "Failed to delete user: " + error.message },
-      { status: 500 }
-    );
+    console.error("Error deleting user:", error instanceof Error ? error.message : "Unknown error");
+    return NextResponse.json({ error: "Failed to delete user" }, { status: 500 });
   }
 }

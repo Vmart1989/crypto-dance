@@ -10,6 +10,8 @@ import BuyCoinModal from "./BuyCoinModal";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
+import { useLanguage } from "@/context/LanguageContext";
+import { stripLocale } from "@/i18n/config";
 
 // Fallback image wrapper component
 const CoinIcon = ({ symbol, name }) => {
@@ -39,6 +41,7 @@ export default function CryptoTicker() {
     direction: "asc",
   });
   const pathname = usePathname();
+  const { t, href } = useLanguage();
 
   useEffect(() => {
     async function fetchCryptos() {
@@ -110,7 +113,7 @@ export default function CryptoTicker() {
           <input
             type="text"
             className="form-control border-0"
-            placeholder="Search assets"
+            placeholder={t("market.search")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -119,7 +122,7 @@ export default function CryptoTicker() {
 
       {isLoading && (
         <div className="spinner-border text-light" role="status">
-          <span className="visually-hidden">Loading...</span>
+          <span className="visually-hidden">{t("dashboard.loading")}</span>
         </div>
       )}
 
@@ -127,7 +130,7 @@ export default function CryptoTicker() {
         <thead className="sticky-top">
           <tr>
             <th></th>
-            <th>Asset</th>
+            <th>{t("market.asset")}</th>
             <th
               className="d-none d-md-table-cell"
               onClick={() => handleSort("marketCapUsd")}
@@ -135,7 +138,7 @@ export default function CryptoTicker() {
                 cursor: search.trim() === "" ? "pointer" : "not-allowed",
               }}
             >
-              Market Cap{renderSortArrow("marketCapUsd")}
+              {t("market.marketCap")}{renderSortArrow("marketCapUsd")}
             </th>
             <th
               className=""
@@ -144,22 +147,22 @@ export default function CryptoTicker() {
                 cursor: search.trim() === "" ? "pointer" : "not-allowed",
               }}
             >
-              Price{renderSortArrow("priceUsd")}
+              {t("market.price")}{renderSortArrow("priceUsd")}
             </th>
-            <th>24h</th>
+            <th>{t("market.change24h")}</th>
           </tr>
         </thead>
         <tbody>
           {!isLoading && loadError && (
-            <tr><td colSpan="5" className="market-state"><i className="bi bi-cloud-slash" /> Market data is taking a break. Please try again shortly.</td></tr>
+            <tr><td colSpan="5" className="market-state"><i className="bi bi-cloud-slash" /> {t("market.unavailable")}</td></tr>
           )}
           {!isLoading && !loadError && displayCryptos.length === 0 && (
-            <tr><td colSpan="5" className="market-state">{search.trim() ? "No assets match your search." : "No market data available."}</td></tr>
+            <tr><td colSpan="5" className="market-state">{search.trim() ? t("market.noResults") : t("market.noData")}</td></tr>
           )}
           {displayCryptos.map((crypto) => (
             <tr key={crypto.id}>
               <td className="text-primary">
-                {pathname === "/dashboard" ? (
+                {stripLocale(pathname) === "/dashboard" ? (
                   <BuyCoinModal
                     coin={crypto}
                     convertValue={convertValue}
@@ -174,7 +177,7 @@ export default function CryptoTicker() {
               <td>
                 <Link
                   className="text-decoration-none link-light"
-                  href={`/coin/${crypto.id}`}
+                  href={href(`/coin/${crypto.id}`)}
                 >
                   <CoinIcon symbol={crypto.symbol} name={crypto.name} />{" "}
                   {crypto.name}
