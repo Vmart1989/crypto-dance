@@ -3,6 +3,7 @@ export const runtime = "nodejs";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verificationTokenHash } from "@/lib/auth";
+import { recordActivity } from "@/lib/activity";
 
 export async function GET(request) {
   const token = request.nextUrl.searchParams.get("token") || "";
@@ -21,6 +22,13 @@ export async function GET(request) {
     prisma.user.update({ where: { id: record.userId }, data: { emailVerifiedAt: new Date() } }),
     prisma.emailVerificationToken.deleteMany({ where: { userId: record.userId } }),
   ]);
+  await recordActivity({
+    request,
+    event: "account.email_verified",
+    category: "account",
+    summary: "User verified their email address",
+    userId: record.userId,
+  });
   redirectUrl.searchParams.set("verification", "success");
   return NextResponse.redirect(redirectUrl);
 }

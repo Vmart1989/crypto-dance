@@ -1,149 +1,25 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { use, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { AdminEmpty, AdminError, AdminShell, AdminStatus, formatAdminDate } from "@/components/AdminShell";
 
-export default function AdminUserDetails() {
-  const { id } = useParams(); // user id from URL
-  const [userData, setUserData] = useState(null);
-  const [fiatBalance, setFiatBalance] = useState("");
-  const [role, setRole] = useState("");
-  const [feedback, setFeedback] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [errorMsg, setErrorMsg] = useState("");
-
-  // Fetch user details on mount
-  useEffect(() => {
-    async function fetchUserDetails() {
-      setLoading(true);
-      setErrorMsg("");
-      try {
-        const res = await fetch(`/api/admin/users/${id}`);
-        const json = await res.json();
-        if (!res.ok) {
-          throw new Error(json.error || "Failed to fetch user details");
-        }
-        setUserData(json.user);
-        // If the user has a wallet, initialize fiatBalance from it, else default to 0.
-        setFiatBalance(json.user.wallet ? json.user.wallet.fiatBalance : 0);
-        setRole(json.user.role);
-      } catch (error) {
-        setErrorMsg(error.message);
-      }
-      setLoading(false);
-    }
-    fetchUserDetails();
-  }, [id]);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await fetch(`/api/admin/users/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fiatBalance: Number(fiatBalance),
-          role, // if you want to allow updating the role
-        }),
-      });
-      const json = await res.json();
-      if (!res.ok) {
-        throw new Error(json.error || "Failed to update user details");
-      }
-      setFeedback("User updated successfully!");
-    } catch (error) {
-      setFeedback(error.message);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="container mt-5">
-        <div className="spinner-border" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
-      </div>
-    );
-  }
-
-  if (!userData) {
-    return <div className="container mt-5">No user found.</div>;
-  }
-
-  return (
-    <div className="container mt-5">
-      <div className="d-flex justify-content-between w-100">
-        <div>
-          <h1>User Details</h1>
-        </div>
-        <div>
-          <Link className="links" href="/admin/users">
-          <i className="bi bi-arrow-return-left me-1"></i>
-          
-            Back to Users
-          </Link>
-        </div>
-      </div>
-      {errorMsg && <p className="text-danger">{errorMsg}</p>}
-      <form onSubmit={handleSubmit}>
-        <div className="mb-3">
-          <label className="form-label">Name</label>
-          <input
-            type="text"
-            className="form-control"
-            value={userData.name || ""}
-            readOnly
-          />
-        </div>
-        <div className="mb-3">
-          <label className="form-label">Email</label>
-          <input
-            type="email"
-            className="form-control"
-            value={userData.email || ""}
-            readOnly
-          />
-        </div>
-        <div className="mb-3">
-          <label className="form-label">Fiat Balance</label>
-          <input
-            type="number"
-            className="form-control"
-            value={fiatBalance}
-            onChange={(e) => setFiatBalance(e.target.value)}
-          />
-        </div>
-        <div className="mb-3">
-          <label className="form-label">Role</label>
-          <select
-            className="form-select"
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-          >
-            <option value="user">User</option>
-            <option value="admin">Admin</option>
-          </select>
-        </div>
-        <button type="submit" className="btn btn-primary">
-          Update User
-        </button>
-      </form>
-      {feedback && <p className="mt-3">{feedback}</p>}
-      <div className="mt-5">
-        <h3>Assets Owned</h3>
-        {userData.cryptoAssets && userData.cryptoAssets.length > 0 ? (
-          <ul className="list-group">
-            {userData.cryptoAssets.map((asset) => (
-              <li key={asset.id} className="list-group-item">
-                {asset.symbol}: {asset.balance}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>No assets owned.</p>
-        )}
-      </div>
-    </div>
-  );
+export default function AdminUserDetail({ params }) {
+  const { id } = use(params); const router = useRouter();
+  const [data,setData]=useState(null); const [error,setError]=useState(""); const [notice,setNotice]=useState(""); const [saving,setSaving]=useState(false); const [confirmDelete,setConfirmDelete]=useState(false); const [form,setForm]=useState({role:"user",fiatBalance:"0"});
+  const load=useCallback(async()=>{ try { const res=await fetch(`/api/admin/users/${id}`,{cache:"no-store"}); const body=await res.json(); if(res.status===401)return router.replace("/admin/login"); if(!res.ok)throw new Error(body.error||"Unable to load user"); setData(body); setForm({role:body.user.role,fiatBalance:String(body.user.wallet?.fiatBalance??0)}); } catch(err){setError(err.message);} },[id,router]);
+  useEffect(()=>{load();},[load]);
+  async function save(e){e.preventDefault();setSaving(true);setError("");setNotice("");try{const res=await fetch(`/api/admin/users/${id}`,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({role:form.role,fiatBalance:Number(form.fiatBalance)})});const body=await res.json();if(!res.ok)throw new Error(body.error||"Unable to save changes");setNotice("Account changes saved and recorded in the audit trail.");await load();}catch(err){setError(err.message);}finally{setSaving(false);}}
+  async function remove(){setSaving(true);setError("");try{const res=await fetch(`/api/admin/users/${id}`,{method:"DELETE"});const body=await res.json();if(!res.ok)throw new Error(body.error||"Unable to delete user");router.replace("/admin/users");}catch(err){setError(err.message);setConfirmDelete(false);setSaving(false);}}
+  if(!data&&!error)return <AdminShell title="User profile"><div className="admin-loading"><span/>Loading account…</div></AdminShell>;
+  const user=data?.user;
+  return <AdminShell eyebrow="Account management" title={user?.name||"User profile"} description={user?.email} actions={<Link className="admin-button" href="/admin/users"><i className="bi bi-arrow-left"/> All users</Link>}><AdminError message={error}/>{notice&&<div className="admin-alert admin-alert-success"><i className="bi bi-check-circle"/>{notice}</div>}
+    {user&&<><section className="admin-profile-hero admin-panel"><div className="admin-profile-avatar">{(user.name||user.email)[0].toUpperCase()}</div><div className="admin-profile-main"><div><h2>{user.name||"Unnamed user"}</h2><span>User #{user.id}</span></div><div className="admin-profile-badges"><AdminStatus tone={user.emailVerifiedAt?"green":"amber"}>{user.emailVerifiedAt?"Email verified":"Verification pending"}</AdminStatus><AdminStatus tone={user.role==="admin"?"violet":"neutral"}>{user.role}</AdminStatus></div></div><dl className="admin-profile-facts"><div><dt>Joined</dt><dd>{formatAdminDate(user.createdAt)}</dd></div><div><dt>Active sessions</dt><dd>{user.sessions.length}</dd></div><div><dt>Total trades</dt><dd>{user._count.transactions}</dd></div></dl></section>
+    <div className="admin-detail-grid"><form className="admin-panel admin-edit-card" onSubmit={save}><div className="admin-panel-head"><div><h2>Account controls</h2><p>Changes are logged automatically.</p></div></div><div className="admin-form-body"><label>Access role<select value={form.role} onChange={(e)=>setForm({...form,role:e.target.value})}><option value="user">User</option><option value="admin">Administrator</option></select></label><label>Virtual EUR balance<div className="admin-money-input"><span>€</span><input type="number" min="0" max="100000" step="0.01" value={form.fiatBalance} onChange={(e)=>setForm({...form,fiatBalance:e.target.value})}/></div></label><button className="admin-button admin-button-primary" disabled={saving}>{saving?"Saving…":"Save changes"}</button></div><div className="admin-danger-zone"><div><strong>Delete account</strong><span>Removes the account, portfolio, and transaction history.</span></div><button type="button" onClick={()=>setConfirmDelete(true)}>Delete</button></div></form>
+    <section className="admin-panel"><div className="admin-panel-head"><div><h2>Virtual portfolio</h2><p>{user.cryptoAssets.length} assets held</p></div></div>{!user.cryptoAssets.length?<AdminEmpty icon="bi-wallet2" title="No assets held"/>:<div className="admin-assets">{user.cryptoAssets.map((asset)=><div key={asset.id}><span>{asset.name?.[0]||asset.cryptoId[0]}</span><div><strong>{asset.name||asset.cryptoId}</strong><small>{Number(asset.balance).toLocaleString("en-GB",{maximumFractionDigits:8})} {asset.symbol?.toUpperCase()}</small></div></div>)}</div>}</section></div>
+    <div className="admin-detail-grid admin-detail-grid-wide"><section className="admin-panel"><div className="admin-panel-head"><div><h2>Recent transactions</h2><p>Latest 20 entries</p></div></div>{!user.transactions.length?<AdminEmpty icon="bi-receipt" title="No transactions"/>:<div className="admin-compact-list">{user.transactions.map((tx)=><div key={tx.id}><AdminStatus tone={tx.type==="buy"?"green":"amber"}>{tx.type}</AdminStatus><div><strong>{tx.cryptoName||tx.cryptoId}</strong><small>{formatAdminDate(tx.createdAt)}</small></div><strong>{Number(tx.fiatAmount).toLocaleString("en-GB",{style:"currency",currency:tx.fiatCurrency})}</strong></div>)}</div>}</section>
+    <section className="admin-panel"><div className="admin-panel-head"><div><h2>Recent activity</h2><p>Authentication and account events</p></div><Link href={`/admin/activity?userId=${id}`}>View all</Link></div>{!data.activity.length?<AdminEmpty icon="bi-activity" title="No tracked activity yet"/>:<div className="admin-compact-list admin-log-list">{data.activity.map((log)=><div key={log.id}><i className="bi bi-dot"/><div><strong>{log.summary}</strong><small>{log.event} · {formatAdminDate(log.createdAt)}</small></div></div>)}</div>}</section></div>
+    {confirmDelete&&<div className="admin-modal-backdrop"><div className="admin-confirm" role="dialog" aria-modal="true" aria-labelledby="delete-title"><i className="bi bi-exclamation-triangle"/><h2 id="delete-title">Delete this account?</h2><p>This permanently removes {user.email} and their virtual portfolio. The admin audit record remains.</p><div><button className="admin-button" onClick={()=>setConfirmDelete(false)}>Cancel</button><button className="admin-button admin-button-danger" onClick={remove} disabled={saving}>{saving?"Deleting…":"Delete permanently"}</button></div></div></div>}</>}
+  </AdminShell>;
 }

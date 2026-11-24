@@ -49,7 +49,8 @@ export async function generateMetadata() {
 }
 
 export default async function RootLayout({ children }) {
-  const { locale } = await requestContext();
+  const { locale, pathname } = await requestContext();
+  const isAdmin = pathname.startsWith("/admin");
   const t = (key) => translate(locale, key);
   const homeHref = localizePath("/", locale);
   const guideHref = localizePath("/guide", locale);
@@ -62,7 +63,7 @@ export default async function RootLayout({ children }) {
         <Script id="google-analytics">{`window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-48WTNGSD0T');`}</Script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
       </head>
-      <body className={`${manrope.variable} ${spaceGrotesk.variable}`}>
+      <body className={`${manrope.variable} ${spaceGrotesk.variable}${isAdmin ? " admin-body" : ""}`}>
         <LanguageProvider initialLocale={locale}>
           <CurrencyProvider>
             <UserProvider>
@@ -75,16 +76,18 @@ export default async function RootLayout({ children }) {
                     <span>Crypto<span>Dance</span></span>
                   </Link>
                   <div className="header-actions">
-                    <Link href={guideHref} className="nav-action guide-nav-link" aria-label={guideLabel}>
-                      <i className="bi bi-compass" aria-hidden="true" /><span className="d-none d-md-inline">{guideLabel}</span>
-                    </Link>
-                    <UserHeader /><LanguageSelector /><CurrencyToggle />
+                    {isAdmin ? <span className="admin-header-label"><i className="bi bi-shield-lock" /> Admin console</span> : (
+                      <Link href={guideHref} className="nav-action guide-nav-link" aria-label={guideLabel}>
+                        <i className="bi bi-compass" aria-hidden="true" /><span className="d-none d-md-inline">{guideLabel}</span>
+                      </Link>
+                    )}
+                    <UserHeader />{!isAdmin && <><LanguageSelector /><CurrencyToggle /></>}
                   </div>
                 </div>
               </header>
-              <div className="container context-bar"><DynamicMessage /></div>
+              {!isAdmin && <div className="container context-bar"><DynamicMessage /></div>}
               <div className="site-content">{children}</div>
-              <footer className="app-footer">
+              {!isAdmin && <footer className="app-footer">
                 <div className="container footer-inner">
                   <div>
                     <Link href={homeHref} className="brand brand-small">
@@ -99,7 +102,7 @@ export default async function RootLayout({ children }) {
                     <span>© {new Date().getFullYear()} CryptoDance</span>
                   </div>
                 </div>
-              </footer>
+              </footer>}
             </UserProvider>
           </CurrencyProvider>
         </LanguageProvider>

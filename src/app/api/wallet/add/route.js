@@ -4,6 +4,7 @@ export const runtime = "nodejs";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { isSameOrigin, requireUser } from "@/lib/auth";
+import { recordActivity } from "@/lib/activity";
 
 export async function POST(request) {
   if (!isSameOrigin(request)) return NextResponse.json({ error: "Invalid request origin" }, { status: 403 });
@@ -31,6 +32,15 @@ export async function POST(request) {
     const updatedWallet = await prisma.wallet.update({
       where: { userId: auth.user.id },
       data: { fiatBalance: wallet.fiatBalance + amount },
+    });
+
+    await recordActivity({
+      request,
+      event: "wallet.virtual_funds_added",
+      category: "wallet",
+      summary: `Added ${Number(amount).toFixed(2)} virtual funds`,
+      userId: auth.user.id,
+      metadata: { amount: Number(amount), balanceAfter: updatedWallet.fiatBalance },
     });
 
     return NextResponse.json({ message: "Balance updated", wallet: updatedWallet });

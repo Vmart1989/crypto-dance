@@ -15,6 +15,7 @@ import {
   validateRegistrationInput,
 } from "@/lib/auth";
 import { sendNewUserNotification, sendVerificationEmail } from "@/lib/email";
+import { recordActivity } from "@/lib/activity";
 
 const genericMessage = "If the address can be registered, check your email for the next step.";
 
@@ -75,6 +76,15 @@ export async function POST(request) {
         emailVerifiedAt: autoVerify ? new Date() : null,
         wallet: { create: { fiatBalance: 0 } },
       },
+    });
+
+    await recordActivity({
+      request,
+      event: "account.registered",
+      category: "account",
+      summary: `${user.email} created an account`,
+      userId: user.id,
+      metadata: { email: user.email, name: user.name },
     });
 
     if (!autoVerify) {

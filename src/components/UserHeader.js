@@ -32,21 +32,19 @@ export default function UserHeader() {
   if (!user || cleanPath.startsWith("/admin/login")) return null;
   
   
-  if (cleanPath.startsWith("/admin/dashboard") ) {
+  if (cleanPath.startsWith("/admin")) {
     return (
-      <div className="d-flex align-items-baseline ">
-      <i className="bi bi-person-fill ms-3 fs-5 "></i>
-      <span className="fs-6 me-4">{user.name || user.email} (admin)</span>
-      <a
+      <div className="admin-user-menu">
+      <span className="admin-user-avatar"><i className="bi bi-person-fill" /></span>
+      <span className="admin-user-identity"><strong>{user.name || "Administrator"}</strong><small>{user.email}</small></span>
+      <button
         onClick={handleLogoutAdmin}
-        style={{ cursor: "pointer" }}
-        className="fs-6 link-offset-2 link-offset-3-hover link-underline-primary link-underline-opacity-0 link-underline-opacity-75-hover me-4"
+        className="admin-logout-button"
+        type="button"
+        aria-label={t("nav.logout")}
       >
-        <i className="bi bi-box-arrow-right fs-5 me-2"></i>
-        {t("nav.logout")}
-      </a>
-
-      
+        <i className="bi bi-box-arrow-right"></i>
+      </button>
     </div>
     )
   }

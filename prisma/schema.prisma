@@ -59,6 +59,24 @@ model AuthThrottle {
   @@index([resetAt])
 }
 
+model ActivityLog {
+  id          Int      @id @default(autoincrement())
+  event       String
+  category    String
+  summary     String
+  userId      Int?
+  actorUserId Int?
+  ipHash      String?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([category, createdAt])
+  @@index([event, createdAt])
+  @@index([userId, createdAt])
+  @@index([actorUserId, createdAt])
+}
+
 model Wallet {
   id          Int   @id @default(autoincrement())
   fiatBalance Float @default(0.0)

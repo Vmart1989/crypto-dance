@@ -57,15 +57,6 @@ export default function DynamicMessage() {
     );
   }
 
-  if (cleanPath.startsWith("/admin") && user) {
-    // Fiat balance from wallet (if available)
-   
-
-    return (
-      <h1>Admin Panel</h1>
-    );
-  }
-
   if (cleanPath.startsWith("/coin") && user) {
     
    

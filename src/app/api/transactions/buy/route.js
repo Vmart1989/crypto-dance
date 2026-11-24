@@ -3,6 +3,7 @@ export const runtime = "nodejs";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { isSameOrigin, requireUser } from "@/lib/auth";
+import { recordActivity } from "@/lib/activity";
 
 export async function POST(request) {
   if (!isSameOrigin(request)) return NextResponse.json({ error: "Invalid request origin" }, { status: 403 });
@@ -80,6 +81,15 @@ export async function POST(request) {
 
     const updatedCryptoAssets = await prisma.cryptoAsset.findMany({
       where: { userId },
+    });
+
+    await recordActivity({
+      request,
+      event: "trading.buy",
+      category: "trading",
+      summary: `Bought ${Number(amount)} ${coinSymbol}`,
+      userId,
+      metadata: { transactionId: transaction.id, coinId, symbol: coinSymbol, amount: Number(amount), fiatAmount: Number(fiatCost), fiatCurrency },
     });
 
     return NextResponse.json({

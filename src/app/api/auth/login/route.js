@@ -14,6 +14,7 @@ import {
   setSessionCookie,
   validateLoginInput,
 } from "@/lib/auth";
+import { recordActivity } from "@/lib/activity";
 
 export async function POST(request) {
   if (!isSameOrigin(request)) return NextResponse.json({ error: "Invalid request origin" }, { status: 403 });
@@ -47,6 +48,14 @@ export async function POST(request) {
       user: { id: user.id, email: user.email, name: user.name, role: user.role },
     });
     setSessionCookie(response, session.token, session.expiresAt);
+    await recordActivity({
+      request,
+      event: user.role === "admin" ? "auth.admin_login" : "auth.login",
+      category: "auth",
+      summary: user.role === "admin" ? "Admin signed in" : "User signed in",
+      userId: user.id,
+      actorUserId: user.role === "admin" ? user.id : null,
+    });
     return response;
   } catch (error) {
     console.error("Login failed", error instanceof Error ? error.message : "Unknown error");
