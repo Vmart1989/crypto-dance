@@ -35,7 +35,18 @@ export async function POST(request) {
     }
     await recordAuthAttempt(throttleKeys, { failed: true });
 
-    if (await isBreachedPassword(input.password)) {
+    let breachedPassword = false;
+    try {
+      breachedPassword = await isBreachedPassword(input.password);
+    } catch (error) {
+      const code =
+        error && typeof error === "object" && "name" in error
+          ? String(error.name)
+          : "UNKNOWN";
+      console.warn(`Password breach check unavailable (${code})`);
+    }
+
+    if (breachedPassword) {
       return NextResponse.json({ error: "That password has appeared in a data breach. Choose a different password." }, { status: 400 });
     }
 
