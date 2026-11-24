@@ -9,91 +9,32 @@ export async function POST(request) {
   if (!isSameOrigin(request)) return NextResponse.json({ error: "Invalid request origin" }, { status: 403 });
   const auth = await requireUser(request);
   if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
   try {
     const userId = auth.user.id;
-
-    // Parse request body - note: we expect both coinId and coinSymbol
     const { coinId, coinSymbol, amount, price, fiatRevenue, fiatCurrency } = await request.json();
+    const cryptoAmount = Number(amount), unitPrice = Number(price), totalRevenue = Number(fiatRevenue);
+    if (!coinId || !coinSymbol || !Number.isFinite(cryptoAmount) || cryptoAmount <= 0 || !Number.isFinite(unitPrice) || unitPrice <= 0 || !Number.isFinite(totalRevenue) || totalRevenue <= 0 || !["EUR", "USD"].includes(fiatCurrency)) return NextResponse.json({ error: "Invalid transaction details" }, { status: 400 });
 
-    if (!coinId || !coinSymbol || !amount || !price || !fiatRevenue || !fiatCurrency) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
-    }
-
-    // Retrieve the user's wallet
-    const wallet = await prisma.wallet.findUnique({ where: { userId } });
-    if (!wallet) {
-      return NextResponse.json({ error: "Wallet not found" }, { status: 404 });
-    }
-
-    // Add fiat value to wallet (for sale, you add the revenue)
-    const updatedWallet = await prisma.wallet.update({
-      where: { userId },
-      data: { fiatBalance: wallet.fiatBalance + Number(fiatRevenue) },
+    const result = await prisma.$transaction(async (tx) => {
+      const wallet = await tx.wallet.findUnique({ where: { userId } });
+      if (!wallet) throw new Error("WALLET_NOT_FOUND");
+      const asset = await tx.cryptoAsset.findFirst({ where: { userId, coinId } });
+      if (!asset) throw new Error("ASSET_NOT_FOUND");
+      const debit = await tx.cryptoAsset.updateMany({ where: { id: asset.id, balance: { gte: cryptoAmount } }, data: { balance: { decrement: cryptoAmount } } });
+      if (!debit.count) throw new Error("INSUFFICIENT_ASSET");
+      const updatedWallet = await tx.wallet.update({ where: { userId }, data: { fiatBalance: { increment: totalRevenue } } });
+      const transaction = await tx.transaction.create({ data: { type: "sell", cryptoSymbol: coinSymbol, coinId, amount: cryptoAmount, price: unitPrice, fiatAmount: totalRevenue, fiatCurrency, userId } });
+      await tx.cryptoAsset.deleteMany({ where: { id: asset.id, balance: { lte: Number.EPSILON } } });
+      const updatedCryptoAssets = await tx.cryptoAsset.findMany({ where: { userId }, orderBy: { balance: "desc" } });
+      return { updatedWallet, transaction, updatedCryptoAssets };
     });
-
-    // Create a transaction record for the sale
-    const transaction = await prisma.transaction.create({
-      data: {
-        type: "sell",
-        cryptoSymbol: coinSymbol,  // e.g. "BTC"
-        coinId: coinId,            // e.g. "bitcoin"
-        amount: Number(amount),
-        price: Number(price),
-        fiatAmount: Number(fiatRevenue),
-        fiatCurrency,
-        user: { connect: { id: userId } },
-      },
-    });
-
-    // Update user's crypto asset using coinId to match
-    const existingAsset = await prisma.cryptoAsset.findFirst({
-      where: {
-        userId,
-        coinId: coinId,
-      },
-    });
-
-    if (!existingAsset) {
-      return NextResponse.json({ error: "You do not own this coin." }, { status: 400 });
-    }
-    if (existingAsset.balance < Number(amount)) {
-      return NextResponse.json({ error: "Insufficient coin balance." }, { status: 400 });
-    }
-
-    let updatedCryptoAsset;
-    if (existingAsset.balance - Number(amount) === 0) {
-      updatedCryptoAsset = await prisma.cryptoAsset.delete({
-        where: { id: existingAsset.id },
-      });
-    } else {
-      updatedCryptoAsset = await prisma.cryptoAsset.update({
-        where: { id: existingAsset.id },
-        data: { balance: existingAsset.balance - Number(amount) },
-      });
-    }
-
-    // Fetch the updated crypto assets
-    const updatedCryptoAssets = await prisma.cryptoAsset.findMany({
-      where: { userId },
-    });
-
-    await recordActivity({
-      request,
-      event: "trading.sell",
-      category: "trading",
-      summary: `Sold ${Number(amount)} ${coinSymbol}`,
-      userId,
-      metadata: { transactionId: transaction.id, coinId, symbol: coinSymbol, amount: Number(amount), fiatAmount: Number(fiatRevenue), fiatCurrency },
-    });
-
-    return NextResponse.json({
-      message: "Sell successful",
-      updatedWallet,
-      updatedCryptoAssets,
-    });
+    await recordActivity({ request, event: "trading.sell", category: "trading", summary: `Sold ${cryptoAmount} ${coinSymbol}`, userId, metadata: { transactionId: result.transaction.id, coinId, symbol: coinSymbol, amount: cryptoAmount, fiatAmount: totalRevenue, fiatCurrency } });
+    return NextResponse.json({ message: "Sell successful", ...result });
   } catch (error) {
-    console.error("Error processing sale:", error);
+    if (error instanceof Error && error.message === "WALLET_NOT_FOUND") return NextResponse.json({ error: "Wallet not found" }, { status: 404 });
+    if (error instanceof Error && error.message === "ASSET_NOT_FOUND") return NextResponse.json({ error: "You do not own this coin." }, { status: 400 });
+    if (error instanceof Error && error.message === "INSUFFICIENT_ASSET") return NextResponse.json({ error: "Insufficient coin balance." }, { status: 400 });
+    console.error("Error processing sale:", error instanceof Error ? error.message : "Unknown error");
     return NextResponse.json({ error: "Failed to process sale" }, { status: 500 });
   }
 }

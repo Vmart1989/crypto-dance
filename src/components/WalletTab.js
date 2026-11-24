@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import styles from "./TopCryptos.module.css";
 import { useUser } from "@/context/UserContext";
 import { useCurrency } from "@/context/CurrencyContext";
@@ -10,29 +10,31 @@ import { useLanguage } from "@/context/LanguageContext";
 
 function computeCoinStats(transactions) {
   const stats = {};
-  transactions.forEach((tx) => {
+  const ordered = [...transactions].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt) || a.id - b.id);
+  ordered.forEach((tx) => {
     if (!tx.cryptoSymbol) return;
     const sym = tx.cryptoSymbol.toLowerCase();
     if (!stats[sym]) {
-      stats[sym] = {
-        netFiatSpent: 0,
-        netCoinsBought: 0,
-      };
+      stats[sym] = { costBasisUsd: 0, quantity: 0 };
     }
+    const amount = Number(tx.amount) || 0;
+    const unitPriceUsd = Number(tx.price) || 0;
     if (tx.type === "buy") {
-      stats[sym].netFiatSpent += tx.fiatAmount;
-      stats[sym].netCoinsBought += tx.amount;
+      stats[sym].costBasisUsd += amount * unitPriceUsd;
+      stats[sym].quantity += amount;
     } else if (tx.type === "sell") {
-      stats[sym].netFiatSpent -= tx.fiatAmount;
-      stats[sym].netCoinsBought -= tx.amount;
+      const averageCost = stats[sym].quantity > 0 ? stats[sym].costBasisUsd / stats[sym].quantity : 0;
+      const sold = Math.min(amount, stats[sym].quantity);
+      stats[sym].costBasisUsd = Math.max(0, stats[sym].costBasisUsd - averageCost * sold);
+      stats[sym].quantity = Math.max(0, stats[sym].quantity - sold);
     }
   });
   const result = {};
   for (const sym in stats) {
-    const { netFiatSpent, netCoinsBought } = stats[sym];
+    const { costBasisUsd, quantity } = stats[sym];
     result[sym] = {
-      fiatInvested: netFiatSpent > 0 ? netFiatSpent : 0,
-      averageCost: netCoinsBought > 0 ? netFiatSpent / netCoinsBought : 0,
+      fiatInvested: costBasisUsd,
+      averageCost: quantity > 0 ? costBasisUsd / quantity : 0,
     };
   }
   return result;
@@ -48,7 +50,6 @@ export default function WalletTab({ refreshTrigger }) {
 
   const [assetData, setAssetData] = useState([]);
   const [coinStats, setCoinStats] = useState({});
-  const [totalUnrealized, setTotalUnrealized] = useState(0);
 
   useEffect(() => {
     if (!user || !user.transactions) return;
@@ -59,13 +60,17 @@ export default function WalletTab({ refreshTrigger }) {
   useEffect(() => {
     async function fetchPrices() {
       if (!user || !user.cryptoAssets) return;
+      setAssetData((previous) => user.cryptoAssets.map((asset) => {
+        const existing = previous.find((coin) => coin.coinId === asset.coinId || coin.symbol === asset.symbol);
+        return existing ? { ...existing, balance: asset.balance, coinId: asset.coinId } : { symbol: asset.symbol, balance: asset.balance, name: asset.symbol, coinId: asset.coinId, priceUsd: 0, change24h: 0 };
+      }));
       const fetched = await Promise.all(
         user.cryptoAssets.map(async (asset) => {
           try {
             const endpoint = asset.coinId
               ? asset.coinId.toLowerCase()
               : asset.symbol.toLowerCase();
-              const res = await fetch(`/api/crypto?id=${endpoint}`);
+              const res = await fetch(`/api/crypto?id=${endpoint}`, { cache: "no-store" });
               const json = await res.json();
             if (!json.data) {
               throw new Error(`No data for ${asset.symbol}`);
@@ -98,7 +103,7 @@ export default function WalletTab({ refreshTrigger }) {
     }
   }, [user, refreshTrigger]);
 
-  useEffect(() => {
+  const totalUnrealizedValue = useMemo(() => {
     let total = 0;
     assetData.forEach((coin) => {
       const key = coin.symbol.toLowerCase();
@@ -107,7 +112,7 @@ export default function WalletTab({ refreshTrigger }) {
       const fiatInvestedFiat = stats.fiatInvested * rate;
       total += currentValueFiat - fiatInvestedFiat;
     });
-    setTotalUnrealized(total);
+    return total;
   }, [assetData, coinStats, rate]);
 
   const totalFiatValueUsd = assetData.reduce((sum, coin) => {
@@ -128,11 +133,9 @@ export default function WalletTab({ refreshTrigger }) {
       <div className="pl-summary">
         <h4>
           {t("wallet.unrealized")}:{" "}
-          <span className={totalUnrealized >= 0 ? "text-info" : "text-danger"}>
+          <span className={totalUnrealizedValue >= 0 ? "text-info" : "text-danger"}>
             {fiatSymbol}
-            {totalUnrealized >= -0.09
-              ? formatFiat(totalUnrealized.toFixed(2))
-              : formatFiat(totalUnrealized.toFixed(4))}
+            {formatFiat(totalUnrealizedValue)}
           </span>
         </h4>
       </div>

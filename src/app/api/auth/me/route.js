@@ -9,7 +9,11 @@ export async function GET(request) {
   if (!auth) return NextResponse.json({ user: null }, { status: 401 });
   const user = await prisma.user.findUnique({
     where: { id: auth.user.id },
-    include: { wallet: true, cryptoAssets: true, transactions: true },
+    include: {
+      wallet: true,
+      cryptoAssets: { orderBy: { balance: "desc" } },
+      transactions: { orderBy: [{ createdAt: "desc" }, { id: "desc" }] },
+    },
   });
   if (!user) return NextResponse.json({ user: null }, { status: 401 });
   return NextResponse.json({
@@ -17,5 +21,5 @@ export async function GET(request) {
       id: user.id, email: user.email, name: user.name, role: user.role,
       wallet: user.wallet, cryptoAssets: user.cryptoAssets, transactions: user.transactions,
     },
-  });
+  }, { headers: { "Cache-Control": "private, no-store, max-age=0" } });
 }

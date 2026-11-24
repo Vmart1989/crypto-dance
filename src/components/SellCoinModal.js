@@ -3,12 +3,13 @@
 import { useState } from "react";
 import { useUser } from "@/context/UserContext";
 
-export default function SellCoinModal({ asset, currency }) {
+export default function SellCoinModal({ asset, currency, rate = 1 }) {
   const { user, setUser } = useUser();
   const fiatSymbol = currency === "USD" ? "$" : "€";
   const [showModal, setShowModal] = useState(false);
   const [sellAmount, setSellAmount] = useState("");
   const [feedback, setFeedback] = useState("");
+  const [processing, setProcessing] = useState(false);
 
   const handleOpen = () => setShowModal(true);
   const handleClose = () => {
@@ -18,6 +19,7 @@ export default function SellCoinModal({ asset, currency }) {
   };
 
   const handleSell = async () => {
+    if (processing) return;
     const amount = parseFloat(sellAmount);
     if (isNaN(amount) || amount <= 0) {
       alert("Please enter a valid positive amount.");
@@ -28,12 +30,13 @@ export default function SellCoinModal({ asset, currency }) {
       return;
     }
     // Calculate revenue: amount * current price in USD
-    const fiatRevenue = amount * asset.currentPriceUsd;
+    const fiatRevenue = amount * asset.currentPriceUsd * rate;
 
     // Fallback: if asset.coinId is null, use asset.symbol for coinId
     const safeCoinId = asset.coinId || asset.symbol;
 
     try {
+      setProcessing(true);
       const res = await fetch("/api/transactions/sell", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -56,6 +59,7 @@ export default function SellCoinModal({ asset, currency }) {
           ...prev,
           wallet: data.updatedWallet,
           cryptoAssets: data.updatedCryptoAssets,
+          transactions: [data.transaction, ...(prev.transactions || [])],
         }));
         setFeedback("Sale successful!");
         setTimeout(() => setFeedback(""), 5000);
@@ -64,6 +68,8 @@ export default function SellCoinModal({ asset, currency }) {
     } catch (error) {
       console.error("Sale error:", error);
       alert("An unexpected error occurred.");
+    } finally {
+      setProcessing(false);
     }
   };
 
@@ -116,7 +122,7 @@ export default function SellCoinModal({ asset, currency }) {
                   </p>
                   <p>
                     <strong>1 {asset.symbol} = </strong> {fiatSymbol}
-                    {Number(asset.currentPriceUsd).toLocaleString(undefined, {
+                    {Number(asset.currentPriceUsd * rate).toLocaleString(undefined, {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
                     })}
@@ -151,7 +157,7 @@ export default function SellCoinModal({ asset, currency }) {
                     ) : (
                       <span>
                         {(
-                          asset.currentPriceUsd * parseFloat(sellAmount || 0)
+                          asset.currentPriceUsd * rate * parseFloat(sellAmount || 0)
                         ).toLocaleString(undefined, {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
@@ -172,8 +178,9 @@ export default function SellCoinModal({ asset, currency }) {
                     type="button"
                     className="btn btn-danger"
                     onClick={handleSell}
+                    disabled={processing}
                   >
-                    Confirm Sale
+                    {processing ? "Processing…" : "Confirm Sale"}
                   </button>
                 </div>
                 {feedback && (

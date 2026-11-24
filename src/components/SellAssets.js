@@ -177,6 +177,7 @@ export default function SellAssets() {
                         assetSymbol,
                       }}
                       currency={currency}
+                      rate={rate}
                     />
                   </td>
                   <td>

@@ -17,6 +17,7 @@ export default function BuyCoinModal({
   const [showModal, setShowModal] = useState(false);
   const [buyAmount, setBuyAmount] = useState("");
   const [feedback, setFeedback] = useState("");
+  const [processing, setProcessing] = useState(false);
   const { currency } = useCurrency();
 
   const handleOpen = () => setShowModal(true);
@@ -27,6 +28,7 @@ export default function BuyCoinModal({
   };
 
   const handleBuy = async () => {
+    if (processing) return;
     const amount = parseFloat(buyAmount);
     if (isNaN(amount) || amount <= 0) {
       alert("Please enter a valid positive amount.");
@@ -41,6 +43,7 @@ export default function BuyCoinModal({
     }
 
     try {
+      setProcessing(true);
       const res = await fetch("/api/transactions/buy", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -66,6 +69,7 @@ export default function BuyCoinModal({
           ...prev,
           wallet: data.updatedWallet,
           cryptoAssets: data.updatedCryptoAssets,
+          transactions: [data.transaction, ...(prev.transactions || [])],
         }));
         setFeedback("Purchase successful!");
         setTimeout(() => setFeedback(""), 5000);
@@ -74,6 +78,8 @@ export default function BuyCoinModal({
     } catch (error) {
       console.error("Purchase error:", error);
       alert("An unexpected error occurred.");
+    } finally {
+      setProcessing(false);
     }
   };
 
@@ -173,8 +179,9 @@ export default function BuyCoinModal({
                     type="button"
                     className="btn btn-primary"
                     onClick={handleBuy}
+                    disabled={processing}
                   >
-                    Confirm Purchase
+                    {processing ? "Processing…" : "Confirm Purchase"}
                   </button>
                 </div>
                 {feedback && (
