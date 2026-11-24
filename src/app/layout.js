@@ -51,6 +51,7 @@ export async function generateMetadata() {
 export default async function RootLayout({ children }) {
   const { locale, pathname } = await requestContext();
   const isAdmin = pathname.startsWith("/admin");
+  const isRecovery = ["/forgot-password", "/reset-password"].includes(pathname);
   const t = (key) => translate(locale, key);
   const homeHref = localizePath("/", locale);
   const guideHref = localizePath("/guide", locale);
@@ -59,8 +60,10 @@ export default async function RootLayout({ children }) {
   return (
     <html lang={locale} data-scroll-behavior="smooth">
       <head>
+        {!isRecovery && <>
         <Script async src="https://www.googletagmanager.com/gtag/js?id=G-48WTNGSD0T" />
         <Script id="google-analytics">{`window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-48WTNGSD0T');`}</Script>
+        </>}
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
       </head>
       <body className={`${manrope.variable} ${spaceGrotesk.variable}${isAdmin ? " admin-body" : ""}`}>

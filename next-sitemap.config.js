@@ -29,7 +29,7 @@ const entry = (path, locale, priority = 0.7) => ({
 module.exports = {
   siteUrl,
   generateRobotsTxt: true,
-  exclude: ["/admin", "/admin/*", "/dashboard", "/dashboard/*", "/api/*"],
+  exclude: ["/admin", "/admin/*", "/dashboard", "/dashboard/*", "/api/*", "/forgot-password", "/reset-password"],
   robotsTxtOptions: {
     policies: [{ userAgent: "*", allow: "/", disallow: ["/admin", "/dashboard", "/api"] }],
   },

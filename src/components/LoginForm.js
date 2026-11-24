@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useUser } from "../context/UserContext"; // Import your UserContext hook
 import { useLanguage } from "@/context/LanguageContext";
@@ -12,7 +13,7 @@ export default function LoginForm() {
   const router = useRouter();
   const { setUser } = useUser(); // get setUser from context
   const [showPassword, setShowPassword] = useState(false);
-  const { t } = useLanguage();
+  const { t, href } = useLanguage();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -81,6 +82,9 @@ export default function LoginForm() {
             </button>
       </div>
       {errorMsg && <p className="text-danger">{errorMsg}</p>}
+      <div className="mb-3 text-end">
+        <Link href={href("/forgot-password")}>{t("recovery.forgot")}</Link>
+      </div>
       <button type="submit" className="btn btn-primary w-100">
         {t("auth.login")}
       </button>

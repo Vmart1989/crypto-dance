@@ -22,6 +22,14 @@ model User {
   cryptoAssets       CryptoAsset[]
   sessions           Session[]
   verificationTokens EmailVerificationToken[]
+  passwordResetToken PasswordResetToken?
+}
+
+model PasswordResetToken {
+  userId    Int      @id
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String   @unique
+  expiresAt DateTime
 }
 
 model Session {

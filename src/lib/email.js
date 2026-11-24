@@ -249,6 +249,33 @@ export async function sendVerificationEmail({ email, name, token }) {
   }
 }
 
+export async function sendPasswordResetEmail({ email, token, path }) {
+  const config = getSmtpConfig();
+  const appUrl = process.env.APP_URL || "https://www.cryptodance.app";
+  const resetUrl = new URL(path, appUrl);
+  resetUrl.hash = new URLSearchParams({ token }).toString();
+  const link = escapeHtml(resetUrl.toString());
+  const logo = escapeHtml(new URL("/logo.png", appUrl).toString());
+  const transporter = createSmtpTransporter(config);
+  try {
+    await transporter.sendMail({
+      from: config.from,
+      to: email,
+      subject: "Reset your CryptoDance password",
+      text: `Reset your CryptoDance password: ${resetUrl}\n\nThis link expires in 30 minutes. If you did not request it, you can ignore this email.`,
+      html: `<div style="max-width:520px;margin:24px auto;padding:28px;border:1px solid #e4d9fa;border-radius:16px;font-family:Arial,sans-serif;color:#201632">
+        <img src="${logo}" width="44" height="44" alt="CryptoDance">
+        <h1 style="font-size:24px">Reset your password</h1>
+        <p>Use the link below to choose a new password for your CryptoDance account.</p>
+        <p><a href="${link}" style="display:inline-block;background:#6d28d9;color:#fff;border-radius:8px;padding:12px 18px;text-decoration:none">Reset password</a></p>
+        <p>This link expires in 30 minutes. If you did not request it, you can ignore this email.</p>
+      </div>`,
+    });
+  } finally {
+    transporter.close();
+  }
+}
+
 export async function sendNewUserNotification({ email, name, registeredAt }) {
   if (process.env.NODE_ENV !== "production") return;
 

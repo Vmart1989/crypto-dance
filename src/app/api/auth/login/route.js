@@ -42,7 +42,8 @@ export async function POST(request) {
 
     await clearAuthAttempts(throttleKeys);
     await prisma.session.deleteMany({ where: { expiresAt: { lte: new Date() } } });
-    const session = await createSession(user.id);
+    const session = await createSession(user.id, user.password);
+    if (!session) return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     const response = NextResponse.json({
       message: "Login successful",
       user: { id: user.id, email: user.email, name: user.name, role: user.role },

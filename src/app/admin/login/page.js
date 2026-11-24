@@ -54,7 +54,10 @@ export default function AdminLogin() {
           <label className="admin-field"><span>Password</span><div className="admin-input-icon"><i className="bi bi-key" /><input type={showPassword ? "text" : "password"} autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} required /><button type="button" onClick={() => setShowPassword((current) => !current)} aria-label={showPassword ? "Hide password" : "Show password"}><i className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"}`} /></button></div></label>
           <button className="admin-button admin-login-submit" type="submit" disabled={submitting}>{submitting ? <><span className="admin-spinner" />Signing in</> : <><i className="bi bi-box-arrow-in-right" />Sign in securely</>}</button>
         </form>
-        <Link href="/" className="admin-back-link"><i className="bi bi-arrow-left" />Return to CryptoDance</Link>
+        <div className="d-flex flex-wrap gap-3">
+          <Link href="/forgot-password" className="admin-back-link">Forgot password?</Link>
+          <Link href="/" className="admin-back-link"><i className="bi bi-arrow-left" />Return to CryptoDance</Link>
+        </div>
       </section>
     </main>
   );

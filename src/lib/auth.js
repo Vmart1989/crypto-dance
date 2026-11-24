@@ -18,15 +18,24 @@ export function normalizeEmail(value) {
   return typeof value === "string" ? value.trim().toLowerCase() : "";
 }
 
+export function isValidEmail(email) {
+  return email.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+export function passwordErrors(password) {
+  const errors = [];
+  if (password.length < 8) errors.push("Use at least 8 characters for your password.");
+  if (Buffer.byteLength(password, "utf8") > 72) errors.push("Password must be at most 72 UTF-8 bytes.");
+  if (commonPasswords.has(password.toLowerCase())) errors.push("Choose a less common password.");
+  return errors;
+}
+
 export function validateRegistrationInput(input) {
   const email = normalizeEmail(input?.email);
   const password = typeof input?.password === "string" ? input.password : "";
   const name = typeof input?.name === "string" ? input.name.trim() : "";
-  const errors = [];
-  if (!email || email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.push("A valid email is required.");
-  if (password.length < 8) errors.push("Use at least 8 characters for your password.");
-  if (Buffer.byteLength(password, "utf8") > 72) errors.push("Password must be at most 72 UTF-8 bytes.");
-  if (commonPasswords.has(password.toLowerCase())) errors.push("Choose a less common password.");
+  const errors = isValidEmail(email) ? [] : ["A valid email is required."];
+  errors.push(...passwordErrors(password));
   if (name.length < 2 || name.length > 50) errors.push("Name must contain 2 to 50 characters.");
   return { valid: errors.length === 0, errors, email, password, name };
 }
@@ -59,14 +68,26 @@ export async function isBreachedPassword(password) {
   return body.split("\n").some((line) => line.split(":")[0].trim() === suffix);
 }
 
-function hashToken(token) {
+export function hashToken(token) {
   return createHash("sha256").update(token).digest("hex");
 }
 
-export async function createSession(userId) {
+export async function createSession(userId, expectedPasswordHash) {
   const token = randomBytes(32).toString("base64url");
   const expiresAt = new Date(Date.now() + SESSION_TTL_MS);
-  await prisma.session.create({ data: { tokenHash: hashToken(token), userId, expiresAt } });
+  const data = { tokenHash: hashToken(token), userId, expiresAt };
+  if (expectedPasswordHash === undefined) {
+    await prisma.session.create({ data });
+  } else {
+    const created = await prisma.$transaction(async (tx) => {
+      // Serialize session creation with password changes after bcrypt has completed.
+      const [user] = await tx.$queryRaw`SELECT "password" FROM "User" WHERE "id" = ${userId} FOR SHARE`;
+      if (user?.password !== expectedPasswordHash) return false;
+      await tx.session.create({ data });
+      return true;
+    });
+    if (!created) return null;
+  }
   return { token, expiresAt };
 }
 
@@ -149,6 +170,10 @@ export function loginThrottleKeys(request, email) {
 
 export function registrationThrottleKeys(request, email) {
   return [throttleKey("register-ip", getClientIp(request)), throttleKey("register-account", email || "invalid")];
+}
+
+export function passwordResetThrottleKeys(request, email) {
+  return [throttleKey("reset-ip", getClientIp(request)), throttleKey("reset-account", email)];
 }
 
 export async function isRateLimited(keys) {

@@ -242,7 +242,65 @@ export const messages = {
   },
 };
 
+const recoveryMessages = {
+  en: {
+    forgot: "Forgot password?",
+    reset: "Reset password",
+    send: "Send reset link",
+    newPassword: "New password (at least 8 characters)",
+    confirm: "Confirm new password",
+    mismatch: "Passwords do not match.",
+    sent: "If a verified account matches that address, you’ll receive a reset link. Check your spam folder too.",
+    changed: "Your password was changed. Sign in with your new password.",
+    invalid: "This reset link is invalid. Request a new link.",
+    unavailable: "Password reset is temporarily unavailable.",
+    pending: "Please wait…",
+  },
+  es: {
+    forgot: "¿Olvidaste tu contraseña?",
+    reset: "Restablecer contraseña",
+    send: "Enviar enlace",
+    newPassword: "Nueva contraseña (mínimo 8 caracteres)",
+    confirm: "Confirmar nueva contraseña",
+    mismatch: "Las contraseñas no coinciden.",
+    sent: "Si hay una cuenta verificada con esa dirección, recibirás un enlace. Revisa también el correo no deseado.",
+    changed: "Se cambió tu contraseña. Inicia sesión con la nueva.",
+    invalid: "El enlace no es válido. Solicita uno nuevo.",
+    unavailable: "El restablecimiento no está disponible temporalmente.",
+    pending: "Espera un momento…",
+  },
+  fr: {
+    forgot: "Mot de passe oublié ?",
+    reset: "Réinitialiser le mot de passe",
+    send: "Envoyer le lien",
+    newPassword: "Nouveau mot de passe (8 caractères minimum)",
+    confirm: "Confirmer le nouveau mot de passe",
+    mismatch: "Les mots de passe ne correspondent pas.",
+    sent: "Si un compte vérifié correspond à cette adresse, vous recevrez un lien. Vérifiez aussi vos courriers indésirables.",
+    changed: "Votre mot de passe a été modifié. Connectez-vous avec le nouveau.",
+    invalid: "Ce lien est invalide. Demandez un nouveau lien.",
+    unavailable: "La réinitialisation est temporairement indisponible.",
+    pending: "Veuillez patienter…",
+  },
+  de: {
+    forgot: "Passwort vergessen?",
+    reset: "Passwort zurücksetzen",
+    send: "Link senden",
+    newPassword: "Neues Passwort (mindestens 8 Zeichen)",
+    confirm: "Neues Passwort bestätigen",
+    mismatch: "Die Passwörter stimmen nicht überein.",
+    sent: "Wenn es ein verifiziertes Konto mit dieser Adresse gibt, erhältst du einen Link. Prüfe auch deinen Spam-Ordner.",
+    changed: "Dein Passwort wurde geändert. Melde dich mit dem neuen Passwort an.",
+    invalid: "Dieser Link ist ungültig. Fordere einen neuen Link an.",
+    unavailable: "Das Zurücksetzen ist vorübergehend nicht verfügbar.",
+    pending: "Bitte warten…",
+  },
+};
+
 export function translate(locale, key, variables = {}) {
+  if (key.startsWith("recovery.")) {
+    return recoveryMessages[normalizeLocale(locale)][key.slice("recovery.".length)] ?? key;
+  }
   const dictionary = messages[normalizeLocale(locale)] || messages.en;
   let value = dictionary[key] ?? messages.en[key] ?? key;
   for (const [name, replacement] of Object.entries(variables)) {
