@@ -14,7 +14,7 @@ import {
   setSessionCookie,
   validateRegistrationInput,
 } from "@/lib/auth";
-import { sendVerificationEmail } from "@/lib/email";
+import { sendNewUserNotification, sendVerificationEmail } from "@/lib/email";
 
 const genericMessage = "If the address can be registered, check your email for the next step.";
 
@@ -80,7 +80,17 @@ export async function POST(request) {
     if (!autoVerify) {
       const verification = createVerificationToken();
       await prisma.emailVerificationToken.create({ data: { userId: user.id, tokenHash: verification.tokenHash, expiresAt: verification.expiresAt } });
-      await sendVerificationEmail({ email: user.email, name: user.name, token: verification.token });
+      const [verificationResult, notificationResult] = await Promise.allSettled([
+        sendVerificationEmail({ email: user.email, name: user.name, token: verification.token }),
+        sendNewUserNotification({ email: user.email, name: user.name, registeredAt: user.createdAt }),
+      ]);
+
+      if (notificationResult.status === "rejected") {
+        console.error("New user registration notification failed");
+      }
+      if (verificationResult.status === "rejected") {
+        throw verificationResult.reason;
+      }
       return NextResponse.json({ message: genericMessage, requiresVerification: true }, { status: 202 });
     }
 

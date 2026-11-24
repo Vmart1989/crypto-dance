@@ -82,6 +82,8 @@ registration sends verification messages through OVH SMTP and requires
 `SMTP_USER`, `SMTP_PASSWORD`, `AUTH_EMAIL_FROM`, and `APP_URL`. The defaults in
 `.env.example` use OVH's SSL/TLS SMTP endpoint on port 465. Keep the mailbox
 password in local or hosting environment variables only; never commit it.
+`REGISTRATION_NOTIFICATION_EMAIL` optionally controls where new-account alerts
+are sent and defaults to the configured SMTP mailbox when omitted.
 
 First, run the development server:
 

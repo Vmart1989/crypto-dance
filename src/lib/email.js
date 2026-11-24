@@ -104,6 +104,81 @@ function createVerificationEmail({ name, verifyUrl, logoUrl, websiteUrl }) {
   };
 }
 
+function createRegistrationNotification({ name, email, registeredAt, adminUrl, logoUrl }) {
+  const displayName = cleanDisplayName(name);
+  const safeName = escapeHtml(displayName);
+  const safeEmail = escapeHtml(email);
+  const safeAdminUrl = escapeHtml(adminUrl);
+  const safeLogoUrl = escapeHtml(logoUrl);
+  const formattedAt = new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "Europe/Paris",
+  }).format(registeredAt);
+
+  return {
+    subject: "New CryptoDance user registration",
+    text: [
+      "A new user registered on CryptoDance.",
+      "",
+      `Name: ${displayName}`,
+      `Email: ${email}`,
+      `Registered: ${formattedAt} (Europe/Paris)`,
+      "",
+      `Review users: ${adminUrl}`,
+    ].join("\n"),
+    html: `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>New CryptoDance user registration</title>
+  </head>
+  <body style="margin:0;padding:0;background-color:#f5f3ff;color:#19152b;font-family:Arial,Helvetica,sans-serif;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;background-color:#f5f3ff;">
+      <tr>
+        <td align="center" style="padding:30px 16px;">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;max-width:560px;background-color:#ffffff;border:1px solid #e6e0ff;border-radius:18px;overflow:hidden;">
+            <tr><td style="height:6px;background-color:#6d28d9;font-size:0;line-height:0;">&nbsp;</td></tr>
+            <tr>
+              <td style="padding:28px 32px 16px;">
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+                  <tr>
+                    <td style="vertical-align:middle;padding-right:11px;"><img src="${safeLogoUrl}" width="42" height="42" alt="CryptoDance" style="display:block;width:42px;height:42px;border:0;border-radius:11px;"></td>
+                    <td style="vertical-align:middle;font-size:20px;line-height:26px;font-weight:700;color:#19152b;">Crypto<span style="color:#6d28d9;">Dance</span></td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:10px 32px 34px;">
+                <p style="margin:0 0 8px;font-size:13px;line-height:20px;font-weight:700;letter-spacing:0.6px;text-transform:uppercase;color:#6d28d9;">New registration</p>
+                <h1 style="margin:0 0 20px;font-size:26px;line-height:34px;letter-spacing:-0.6px;color:#19152b;">A new user joined CryptoDance</h1>
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;background-color:#f8f7ff;border:1px solid #e9e5fb;border-radius:12px;">
+                  <tr><td style="padding:18px 20px 8px;font-size:12px;line-height:18px;font-weight:700;text-transform:uppercase;color:#817991;">Name</td></tr>
+                  <tr><td style="padding:0 20px 14px;font-size:16px;line-height:24px;color:#2f2944;">${safeName}</td></tr>
+                  <tr><td style="padding:0 20px 8px;font-size:12px;line-height:18px;font-weight:700;text-transform:uppercase;color:#817991;">Email</td></tr>
+                  <tr><td style="padding:0 20px 14px;font-size:16px;line-height:24px;color:#2f2944;word-break:break-all;">${safeEmail}</td></tr>
+                  <tr><td style="padding:0 20px 8px;font-size:12px;line-height:18px;font-weight:700;text-transform:uppercase;color:#817991;">Registered</td></tr>
+                  <tr><td style="padding:0 20px 18px;font-size:16px;line-height:24px;color:#2f2944;">${escapeHtml(formattedAt)} <span style="color:#817991;">(Europe/Paris)</span></td></tr>
+                </table>
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin-top:24px;">
+                  <tr><td bgcolor="#6d28d9" style="border-radius:10px;"><a href="${safeAdminUrl}" style="display:inline-block;padding:13px 21px;font-size:15px;line-height:20px;font-weight:700;color:#ffffff;text-decoration:none;border-radius:10px;">Review users</a></td></tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>`,
+  };
+}
+
 function getSmtpConfig() {
   const host = process.env.SMTP_HOST || "smtp.mail.ovh.net";
   const port = Number(process.env.SMTP_PORT || 465);
@@ -116,6 +191,21 @@ function getSmtpConfig() {
   }
 
   return { host, port, user, password, from };
+}
+
+function createSmtpTransporter({ host, port, user, password }) {
+  return nodemailer.createTransport({
+    host,
+    port,
+    secure: port === 465,
+    auth: { user, pass: password },
+    connectionTimeout: 8000,
+    greetingTimeout: 8000,
+    socketTimeout: 12000,
+    tls: { minVersion: "TLSv1.2" },
+    disableFileAccess: true,
+    disableUrlAccess: true,
+  });
 }
 
 export async function sendVerificationEmail({ email, name, token }) {
@@ -136,18 +226,7 @@ export async function sendVerificationEmail({ email, name, token }) {
     websiteUrl: appUrl,
   });
 
-  const transporter = nodemailer.createTransport({
-    host,
-    port,
-    secure: port === 465,
-    auth: { user, pass: password },
-    connectionTimeout: 8000,
-    greetingTimeout: 8000,
-    socketTimeout: 12000,
-    tls: { minVersion: "TLSv1.2" },
-    disableFileAccess: true,
-    disableUrlAccess: true,
-  });
+  const transporter = createSmtpTransporter({ host, port, user, password });
 
   try {
     await transporter.sendMail({
@@ -165,6 +244,44 @@ export async function sendVerificationEmail({ email, name, token }) {
         : "UNKNOWN";
     console.error(`OVH SMTP verification email failed (${code})`);
     throw new Error("Verification email could not be sent");
+  } finally {
+    transporter.close();
+  }
+}
+
+export async function sendNewUserNotification({ email, name, registeredAt }) {
+  if (process.env.NODE_ENV !== "production") return;
+
+  const { host, port, user, password, from } = getSmtpConfig();
+  const recipient = process.env.REGISTRATION_NOTIFICATION_EMAIL || user;
+  const appUrl = (process.env.APP_URL || "https://www.cryptodance.app").replace(
+    /\/$/,
+    ""
+  );
+  const message = createRegistrationNotification({
+    name,
+    email,
+    registeredAt,
+    adminUrl: new URL("/admin/users", appUrl).toString(),
+    logoUrl: new URL("/logo.png", appUrl).toString(),
+  });
+  const transporter = createSmtpTransporter({ host, port, user, password });
+
+  try {
+    await transporter.sendMail({
+      from,
+      to: recipient,
+      subject: message.subject,
+      text: message.text,
+      html: message.html,
+    });
+  } catch (error) {
+    const code =
+      error && typeof error === "object" && "code" in error
+        ? String(error.code)
+        : "UNKNOWN";
+    console.error(`New user notification email failed (${code})`);
+    throw new Error("New user notification could not be sent");
   } finally {
     transporter.close();
   }
